@@ -22,16 +22,21 @@ class Crab(Player):
             "vision": {"status": False, "timer": 0},
             "weakness": {"status": False, "timer": 0}
         }
-        self.speed = 4
+        self.speed = 6
 
     def update_location(self, move):
         self._location = (self._location[0]+move[0], self._location[1]+move[1])
+        print(self._location)
+        self.rect = pygame.Rect(self._location[0], self._location[1], 35, 35)
+        print(self.rect)
 
     def get_location(self):
         return self._location
 
     def update(self):
-        if pygame.time.get_ticks()%5 == 0:
+        if pygame.time.get_ticks()%3 == 0:
             self._index += 1
             if self._index >= len(self._standing_still_animation_frames):
                 self._index = 0
+            self.img = self._standing_still_animation_frames[self._index]
+            

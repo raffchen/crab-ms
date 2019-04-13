@@ -4,7 +4,7 @@ import pygame
 class Pebble:
     
     img = pygame.transform.scale(pygame.image.load("./data/images/pebble.png"), (20, 20))
-    speed = 5
+    speed = 15
     
     def __init__(self, vector_direction, location):
         self.vector_direction = pygame.math.Vector2(vector_direction).normalize()
