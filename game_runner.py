@@ -1,6 +1,5 @@
 import pygame
 
-
 class GameView:
     def __init__(self):
         self.size_tuple = (400,600)
