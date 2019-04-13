@@ -1,8 +1,9 @@
 import pygame
 from game import Game
 from pathlib import Path
-from random import random,choice
+from random import random, choice, shuffle
 import map_generator
+
 
 class Player:
     def __init__(self, image: str, size: tuple, location: tuple = (0, 0)):
@@ -10,11 +11,13 @@ class Player:
         self.rect = self.img.get_rect()
         self.rect = self.rect.move(location)
 
+
 class Crab(Player):
     def __init__(self, image: str, size: tuple, location: tuple = (0, 0)):
         Player.__init__(self, image, size, location)
-        self.health = 1000
+        self.health = 80
         self._location = location
+
         self._index = 0
         
         self._standing_still_animation_frames = [
@@ -26,7 +29,7 @@ class Crab(Player):
         
     def update_location(self,move):
         self._location = (self._location[0]+move[0],self._location[1]+move[1])
-        
+       
 
     def get_location(self):
         return self._location
@@ -44,52 +47,29 @@ class Crab(Player):
 class Seagull(Player):
     def __init__(self, image: str, size: tuple, background, location: tuple = (0, 0)):
         Player.__init__(self, image, size, location)
-        self.direction = choice(["up","left", "down", "right", \
-                                 "left-up","right-up","left-down","right-down"])
+        self.direction = choice(["up", "left", "down", "right",
+                                 "left-up", "right-up", "left-down", "right-down"])
         self.background = background
 
     def move(self):
-        moves = {"up": (0, random()*-5), "left": (random()*-5, 0), "down": (0, random()*5), "right": (random()*5, 0),\
-                 "left-up":(random()*-3,random()*-3),"right-up":(random()*3,random()*-3),"left-down":(random()*-3,random()*3),"right-down":(random()*3,random()*3)}
+        moves = {"up": (0, random()*-5), "left": (random()*-5, 0), "down": (0, random()*5), "right": (random()*5, 0),
+                 "left-up": (random()*-3, random()*-3), "right-up": (random()*3, random()*-3),
+                 "left-down": (random()*-3, random()*3), "right-down": (random()*3, random()*3)}
         if ((self.direction == "up" and not self.rect.top < self.background.rect.top+350)
             or (self.direction == "left" and not self.rect.left < self.background.rect.left+250)
             or (self.direction == "down" and not self.rect.bottom > self.background.rect.bottom-350)
             or (self.direction == "right" and not self.rect.right > self.background.rect.right-250)
-            or (self.direction == "left-up" and not (self.rect.top < self.background.rect.top+350 or \
+            or (self.direction == "left-up" and not (self.rect.top < self.background.rect.top+350 or
                                                      self.rect.left < self.background.rect.left+250))
-            or (self.direction == "right-up" and not (self.rect.top < self.background.rect.top+350 or \
-                                                     self.rect.right > self.background.rect.right-250))
-            or (self.direction == "left-down" and not (self.rect.bottom > self.background.rect.bottom-350 or \
-                                                     self.rect.left < self.background.rect.left+250))
-            or (self.direction == "right-down" and not (self.rect.bottom > self.background.rect.bottom-350 or \
-                                                     self.rect.right > self.background.rect.right-250))):
+            or (self.direction == "right-up" and not (self.rect.top < self.background.rect.top+350 or
+                                                      self.rect.right > self.background.rect.right-250))
+            or (self.direction == "left-down" and not (self.rect.bottom > self.background.rect.bottom-350 or
+                                                       self.rect.left < self.background.rect.left+250))
+            or (self.direction == "right-down" and not (self.rect.bottom > self.background.rect.bottom-350 or
+                                                        self.rect.right > self.background.rect.right-250))):
             self.rect = self.rect.move(*moves[self.direction])
         else:
-            self.direction = choice(["up","left", "down", "right", \
-                                 "left-up","right-up","left-down","right-down"])
-
-        
-
-
-
-class Symptom:
-    """class to house all the different debuffs that the player can experience"""
-    pass
-
-
-class LossOfBalance(Symptom):
-    """character moves in a different direction than input"""
-    pass
-
-
-class Fatigue(Symptom):
-    """character moves much slower while fatigued"""
-    pass
-
-
-class VisionProblems(Symptom):
-    """player's view of the map is limited as vignette effect obscures the edges of the map"""
-    pass
+            self.direction = choice(["up", "left", "down", "right", "left-up", "right-up", "left-down", "right-down"])
 
 
 class GameView:
@@ -99,9 +79,20 @@ class GameView:
         self.background = Player(str(Path("./data/images/beach.jpg")), (map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_WIDTH, map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_HEIGHT))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (60, 60), (300, 200))
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
+
         #self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
         #              Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
         #              Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
+
+        self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health1.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health2.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health3.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health4.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health5.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health6.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health7.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health8.png")), (216, 134), (237,-10))]
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -133,6 +124,7 @@ class GameView:
             
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
+        self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
         pygame.display.flip()
 
     def _handle_events(self):
@@ -156,50 +148,38 @@ class GameView:
     def _move(self, key):
         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
         
-        # if random() < 0.20:
-        #     key = choice(["up", "left", "right", "down"])
-        #
-        # if not self.player.get_location() == (300, 200):
-        #     if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
-        #             or (key == "left" and not self.player.rect.left <= self.background.rect.left)
-        #             or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
-        #             or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
-        #         self._character_move(key)
+        #if random() < 0.20:
+         #    key = choice(["up", "left", "right", "down"])
+        
+      
                 
-        if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
-                or (key == "left" and not self.player.rect.left <= self.background.rect.left)
-                or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
-                or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+        if ((key == "up" and not self.player.rect.top <= self.background.rect.top+200)
+            or (key == "left" and not self.player.rect.left <= self.background.rect.left+300)
+            or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom-250)
+            or (key == "right" and not self.player.rect.right >= self.background.rect.right-350)):
             self.background.rect = self.background.rect.move(*moves[key])
-            if moves[key][0] != 0:
-                map_generator.default_x_coord += moves[key][0]
-            elif moves[key][1] != 0:
-                map_generator.default_y_coord += moves[key][1]
-            
-        # else:
-        #     self._character_move(key)
+        '''else:
+             self._character_move(key)'''
 
         if random() > 0.9:
             self.player.health -= 1
-            print(self.player.health)
 
-    # def _character_move(self, key):
-    #     moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
-    #     if key == 'up':
-    #         key = 'down'
-    #     elif key == 'down':
-    #         key = 'up'
-    #     elif key == 'left':
-    #         key = 'right'
-    #     elif key == 'right':
-    #         key = 'left'
-    #     if ((key == "up" and not self.player.rect.top < self.background.rect.top)
-    #             or (key == "left" and not self.player.rect.left < self.background.rect.left)
-    #             or (key == "down" and not self.player.rect.bottom > self.background.rect.bottom)
-    #             or (key == "right" and not self.player.rect.right > self.background.rect.right)):
-    #         self.player.rect = self.player.rect.move(*moves[key])
-    #         self.player.update_location(moves[key])
-
+    def _character_move(self, key):
+         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+         if key == 'up':
+             key = 'down'
+         elif key == 'down':
+             key = 'up'
+         elif key == 'left':
+             key = 'right'
+         elif key == 'right':
+             key = 'left'
+         if ((key == "up" and self.player.rect.top < self.background.rect.top)
+                 or (key == "left" and self.player.rect.left > self.background.rect.left)
+                 or (key == "down" and self.player.rect.bottom > self.background.rect.bottom)
+                 or (key == "right" and self.player.rect.right < self.background.rect.right+72)):
+             self.player.rect = self.player.rect.move(*moves[key])
+             self.player.update_location(moves[key])
 
 if __name__ == '__main__':
     game = Game()
