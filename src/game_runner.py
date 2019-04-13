@@ -13,16 +13,16 @@ class GameView:
         self.running = True
         self.screen = pygame.display.set_mode((700, 450))
         self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
-        self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
+        self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
         # TEST
-        self.player.symptoms['loss-of-balance']['status'] = True
-        self.player.symptoms['fatigue']['status'] = True
+        self.player.symptoms['loss-of-balance']['status'] = False
+        self.player.symptoms['fatigue']['status'] = False
         # END TEST
         self.pebbles = []
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
-        self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+        '''self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
-                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
+                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]'''
         self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (10, -30)),
                        Player(str(Path("./data/images/health1.png")), (216, 134), (10, -30)),
                        Player(str(Path("./data/images/health2.png")), (216, 134), (10, -30)),
@@ -51,9 +51,6 @@ class GameView:
             for _ in range(4):
                 clock.tick(60)
                 self._handle_events()
-                self._display_board()
-            for gull in self.gulls:
-                gull.move()
                 self._display_board()
         pygame.quit()  
 
@@ -156,9 +153,6 @@ class GameView:
                 map_generator.default_x_coord += self.moves[key][0]
             elif self.moves[key][1] != 0:
                 map_generator.default_y_coord += self.moves[key][1]
-
-        if random() > 0.9:
-            self.player.health -= 1
 
         for pebble in self.pebbles:
             if self.moves[key][0] != 0:
