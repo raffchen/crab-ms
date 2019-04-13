@@ -71,6 +71,7 @@ class GameView:
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
+        self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -121,7 +122,7 @@ class GameView:
                 self.__init__()
 
     def _move(self, key):
-        moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+
         
         # if random() < 0.20:
         #     key = choice(["up", "left", "right", "down"])
@@ -136,17 +137,20 @@ class GameView:
             if flag:
                 # symptom do stuff
                 # maybe another dict??
-                pass
+                if symptom == 'loss-of-balance':
+                    self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
+                                      sorted(self.moves.values(), key=lambda x: random())))
+                    self.player.symptoms[symptom] = False
                 
         if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
                 or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
                 or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
-            self.background.rect = self.background.rect.move(*moves[key])
-            if moves[key][0] != 0:
-                map_generator.default_x_coord += moves[key][0]
-            elif moves[key][1] != 0:
-                map_generator.default_y_coord += moves[key][1]
+            self.background.rect = self.background.rect.move(*self.moves[key])
+            if self.moves[key][0] != 0:
+                map_generator.default_x_coord += self.moves[key][0]
+            elif self.moves[key][1] != 0:
+                map_generator.default_y_coord += self.moves[key][1]
             
         # else:
         #     self._character_move(key)
