@@ -19,6 +19,7 @@ class GameView:
         self.player.symptoms['fatigue']['status'] = False
         # END TEST
         self.pebbles = []
+        self.stage = 1
         self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
                        Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
                        Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
