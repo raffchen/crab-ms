@@ -71,15 +71,15 @@ class GameView:
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
-        self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (237,-10)),\
-                       Player(str(Path("./data/images/health1.png")), (216, 134), (237,-10)),\
-                       Player(str(Path("./data/images/health2.png")), (216, 134), (237,-10)),\
-                       Player(str(Path("./data/images/health3.png")), (216, 134), (237,-10)),\
-                       Player(str(Path("./data/images/health4.png")), (216, 134), (237,-10)),\
-                       Player(str(Path("./data/images/health5.png")), (216, 134), (237,-10)),\
-                       Player(str(Path("./data/images/health6.png")), (216, 134), (237,-10)),\
-                       Player(str(Path("./data/images/health7.png")), (216, 134), (237,-10)),\
-                       Player(str(Path("./data/images/health8.png")), (216, 134), (237,-10))]
+        self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (10,-30)),\
+                       Player(str(Path("./data/images/health1.png")), (216, 134), (10,-30)),\
+                       Player(str(Path("./data/images/health2.png")), (216, 134), (10,-30)),\
+                       Player(str(Path("./data/images/health3.png")), (216, 134), (10,-30)),\
+                       Player(str(Path("./data/images/health4.png")), (216, 134), (10,-30)),\
+                       Player(str(Path("./data/images/health5.png")), (216, 134), (10,-30)),\
+                       Player(str(Path("./data/images/health6.png")), (216, 134), (10,-30)),\
+                       Player(str(Path("./data/images/health7.png")), (216, 134), (10,-30)),\
+                       Player(str(Path("./data/images/health8.png")), (216, 134), (10,-30))]
 
         self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
 
@@ -102,7 +102,7 @@ class GameView:
 
     def _display_board(self):
         """displays the board when it changes"""
-        self.screen.fill(pygame.Color(255, 255, 255))
+        self.screen.fill(pygame.Color(0, 0, 0))
         #self.screen.blit(self.background.img, self.background.rect)
         map_generator.loadLevel(self.screen, 'level1.txt')
         for gull in self.gulls:
@@ -159,11 +159,9 @@ class GameView:
                         del self._moves
                         self.player.symptoms[symptom]["status"] = False
                         self.player.symptoms[symptom]["timer"] = 0
-                        print(flag["timer"])
                     else:
                         self.player.symptoms[symptom]["timer"] += 1
-                        print(flag["timer"])
-                
+  
         if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
                 or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
