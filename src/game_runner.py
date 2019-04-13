@@ -15,7 +15,7 @@ class Player:
 class Crab(Player):
     def __init__(self, image: str, size: tuple, location: tuple = (0, 0)):
         Player.__init__(self, image, size, location)
-        self.health = 1000
+        self.health = 80
         self._location = location
 
     def update_location(self, move):
@@ -123,7 +123,7 @@ class GameView:
             if keys[pygame.K_r]:
                 self.__init__(Game())
 
-def _move(self, key):
+    def _move(self, key):
         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
         
         #if random() < 0.20:
