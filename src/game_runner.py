@@ -7,12 +7,15 @@ from player import Player
 from seagull import Seagull
 from pebble import Pebble
 
+IMAGE_WIDTH = map_generator.IMAGE_WIDTH
+IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
+ROW_LENGTH = map_generator.ABSOLUTE_BORDER_SIZE
 
 class GameView:
     def __init__(self):
         self.running = True
-        self.screen = pygame.display.set_mode((700, 450))
-        self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
+        self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
+        self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
         # TEST
         self.player.symptoms['loss-of-balance']['status'] = False
@@ -33,8 +36,9 @@ class GameView:
                        Player(str(Path("./data/images/health7.png")), (216, 134), (10, -30)),
                        Player(str(Path("./data/images/health8.png")), (216, 134), (10, -30))]
 
-        self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
-                      "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
+        self.moves = {"up": (0, -self.player.speed), "left": (-self.player.speed, 0),
+                      "down": (0, self.player.speed), "right": (self.player.speed, 0)}
+        print(self.moves)
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
@@ -148,17 +152,8 @@ class GameView:
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
                 or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
                 or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
-            self.background.rect = self.background.rect.move(*self.moves[key])
-            if self.moves[key][0] != 0:
-                map_generator.default_x_coord += self.moves[key][0]
-            elif self.moves[key][1] != 0:
-                map_generator.default_y_coord += self.moves[key][1]
-
-        for pebble in self.pebbles:
-            if self.moves[key][0] != 0:
-                pebble.location = (pebble.location[0] + self.moves[key][0], pebble.location[1])
-            elif self.moves[key][1] != 1:
-                pebble.location = (pebble.location[0], pebble.location[1] + self.moves[key][1])
+            self.player.update_location(self.moves[key])
+            
 
 
 if __name__ == '__main__':

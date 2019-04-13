@@ -5,7 +5,7 @@ import os
 from email.policy import default
 
 
-ABSOLUTE_BORDER_SIZE = 18
+ABSOLUTE_BORDER_SIZE = 12
 
 IMAGE_WIDTH = 75
 IMAGE_HEIGHT = 75
@@ -19,8 +19,8 @@ SAND = pygame.transform.scale(SAND, (IMAGE_WIDTH, IMAGE_HEIGHT))
 UNDERWATER = pygame.image.load('./data/images/underwater.png')
 UNDERWATER = pygame.transform.scale(UNDERWATER, (IMAGE_WIDTH, IMAGE_HEIGHT))
 
-DEFAULT_STARTING_Y_COORD = -300
-DEFAULT_STARTING_X_COORD = -300
+DEFAULT_STARTING_Y_COORD = 0
+DEFAULT_STARTING_X_COORD = 0
 
 default_x_coord = DEFAULT_STARTING_X_COORD
 default_y_coord = DEFAULT_STARTING_Y_COORD
