@@ -10,7 +10,7 @@ class Game:
     def _init_board(self):
         num_col = randrange(3,7)
         num_row = randrange(4,8)
-        crab_pos = (randrange(num_col),randrange(1,num_row+1))
+        crab_pos = (randrange(1,num_col+1),randrange(num_row))
         for row in range(num_row):
             col_lst = []
             for col in range(num_col+2):
