@@ -1,7 +1,7 @@
 import pygame
 from game import Game
 from pathlib import Path
-from random import random
+from random import random,choice
 
 
 class Player:
@@ -71,13 +71,14 @@ class GameView:
 
     def _move(self, key):
         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
-
-        self.screen.fill(pygame.Color(255, 255, 255))
-        if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
-                or (key == "left" and not self.player.rect.left <= self.background.rect.left)
-                or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
-                or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
-            self.background.rect = self.background.rect.move(*moves[key])
+        if(random()<0.80):
+            if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
+                    or (key == "left" and not self.player.rect.left <= self.background.rect.left)
+                    or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
+                    or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+                self.background.rect = self.background.rect.move(*moves[key])
+        else:
+            self.background.rect = self.background.rect.move(*moves[choice(["up","left","right","down"])])
         if(random()>0.9):
             self.player.health -=1
         pygame.display.flip()
