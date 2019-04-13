@@ -15,6 +15,7 @@ class GameView:
         self.screen.fill(pygame.Color(255,255,255))
         self._build_board()
         pygame.display.flip()
+    
     def _resize_screen(self, size: (int,int)) -> None:
         '''changes the size of the game screen'''
         self.screen = pygame.display.set_mode(size, pygame.RESIZABLE) 
