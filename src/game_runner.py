@@ -15,6 +15,23 @@ class Crab(Player):
         Player.__init__(self, image, size, location)
         self.health = 25
 
+class Seagull(Player):
+    def __init__(self, image: str, size: tuple, background, location: tuple = (0, 0)):
+        Player.__init__(self, image, size, location)
+        self.direction = choice(["up","left", "down", "right"])
+        self.background = background
+
+    def move(self):
+        moves = {"up": (0, -4), "left": (-4, 0), "down": (0, 4), "right": (4, 0)}
+        if ((self.direction == "up" and not self.rect.top <= self.background.rect.top+350)
+            or (self.direction == "left" and not self.rect.left <= self.background.rect.left+250)
+            or (self.direction == "down" and not self.rect.bottom >= self.background.rect.bottom-350)
+            or (self.direction == "right" and not self.rect.right >= self.background.rect.right-250)):
+            self.rect = self.rect.move(*moves[self.direction])
+        else:
+            self.direction = choice(["up","left", "down", "right"])
+
+        
 
 class GameView:
     def __init__(self, game_state):
@@ -23,7 +40,11 @@ class GameView:
         self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
         self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
-
+        self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),\
+                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),\
+                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
+        
+        
     def run(self):
         """initializes, executes, and quits the pygame"""
         pygame.init()
@@ -32,10 +53,13 @@ class GameView:
         clock = pygame.time.Clock()
 
         while self.game.running:
-            clock.tick(60)
-
-            self._handle_events()
-            self._display_board()
+            for num in range(4):
+                clock.tick(60)
+                self._handle_events()
+                self._display_board()
+            for gull in self.gulls:
+                gull.move()
+                self._display_board()
         pygame.quit()  
 
         
@@ -44,6 +68,8 @@ class GameView:
         """displays the board when it changes"""
         self.screen.fill(pygame.Color(255, 255, 255))
         self.screen.blit(self.background.img, self.background.rect)
+        for gull in self.gulls:
+            self.screen.blit(gull.img, gull.rect)
         if(self.player.health > 0):
             self.screen.blit(self.player.img, self.player.rect)
         else:
@@ -81,7 +107,6 @@ class GameView:
             self.background.rect = self.background.rect.move(*moves[choice(["up","left","right","down"])])
         if(random()>0.9):
             self.player.health -=1
-        pygame.display.flip()
 
 
 if __name__ == '__main__':
