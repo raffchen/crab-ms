@@ -41,6 +41,26 @@ class Seagull(Player):
             self.direction = choice(["up", "left", "down", "right"])
 
 
+class Symptom:
+    """class to house all the different debuffs that the player can experience"""
+    pass
+
+
+class LossOfBalance(Symptom):
+    """character moves in a different direction than input"""
+    pass
+
+
+class Fatigue(Symptom):
+    """character moves much slower while fatigued"""
+    pass
+
+
+class VisionProblems(Symptom):
+    """player's view of the map is limited as vignette effect obscures the edges of the map"""
+    pass
+
+
 class GameView:
     def __init__(self, game_state):
         self.game = game_state
@@ -60,9 +80,10 @@ class GameView:
         clock = pygame.time.Clock()
 
         while self.game.running:
-            clock.tick(60)
-            self._handle_events()
-            self._display_board()
+            for _ in range(4):
+                clock.tick(60)
+                self._handle_events()
+                self._display_board()
             for gull in self.gulls:
                 gull.move()
                 self._display_board()
@@ -101,43 +122,44 @@ class GameView:
     def _move(self, key):
         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
         
-        if random() < 0.20:
-            key = choice(["up", "left", "right", "down"])
-
-        if not self.player.get_location() == (300, 200):
-            if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
-                    or (key == "left" and not self.player.rect.left <= self.background.rect.left)
-                    or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
-                    or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
-                self._character_move(key)
+        # if random() < 0.20:
+        #     key = choice(["up", "left", "right", "down"])
+        #
+        # if not self.player.get_location() == (300, 200):
+        #     if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
+        #             or (key == "left" and not self.player.rect.left <= self.background.rect.left)
+        #             or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
+        #             or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+        #         self._character_move(key)
                 
-        elif ((key == "up" and not self.player.rect.top <= self.background.rect.top+250)
-                or (key == "left" and not self.player.rect.left <= self.background.rect.left+350)
-                or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom-250)
-                or (key == "right" and not self.player.rect.right >= self.background.rect.right-350)):
+        if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
+                or (key == "left" and not self.player.rect.left <= self.background.rect.left)
+                or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
+                or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
             self.background.rect = self.background.rect.move(*moves[key])
-        else:
-            self._character_move(key)
+        # else:
+        #     self._character_move(key)
 
-        if random() > 0.99:
+        if random() > 0.9:
             self.player.health -= 1
+            print(self.player.health)
 
-    def _character_move(self, key):
-        moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
-        if key == 'up':
-            key = 'down'
-        elif key == 'down':
-            key = 'up'
-        elif key == 'left':
-            key = 'right'
-        elif key == 'right':
-            key = 'left'
-        if ((key == "up" and not self.player.rect.top < self.background.rect.top)
-                or (key == "left" and not self.player.rect.left < self.background.rect.left)
-                or (key == "down" and not self.player.rect.bottom > self.background.rect.bottom)
-                or (key == "right" and not self.player.rect.right > self.background.rect.right)):
-            self.player.rect = self.player.rect.move(*moves[key])
-            self.player.update_location(moves[key])
+    # def _character_move(self, key):
+    #     moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+    #     if key == 'up':
+    #         key = 'down'
+    #     elif key == 'down':
+    #         key = 'up'
+    #     elif key == 'left':
+    #         key = 'right'
+    #     elif key == 'right':
+    #         key = 'left'
+    #     if ((key == "up" and not self.player.rect.top < self.background.rect.top)
+    #             or (key == "left" and not self.player.rect.left < self.background.rect.left)
+    #             or (key == "down" and not self.player.rect.bottom > self.background.rect.bottom)
+    #             or (key == "right" and not self.player.rect.right > self.background.rect.right)):
+    #         self.player.rect = self.player.rect.move(*moves[key])
+    #         self.player.update_location(moves[key])
 
 
 if __name__ == '__main__':
