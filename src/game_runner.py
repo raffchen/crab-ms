@@ -82,6 +82,10 @@ class GameView:
                        Player(str(Path("./data/images/health8.png")), (216, 134), (10,-30))]
 
         self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+        pygame.mixer.init()
+        pygame.mixer.music.set_volume(0.5)
+        song = pygame.mixer.music.load("./data/music/Intro.mp3")
+        pygame.mixer.music.play(1)
 
     def run(self):
         """initializes, executes, and quits the pygame"""
