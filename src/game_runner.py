@@ -85,13 +85,10 @@ class GameView:
 
         self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
                       "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
-
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
-        pygame.mixer.music.play(0)
-        pygame.mixer.music.set_volume(0.7)
-        pygame.mixer.music.queue("./data/music/Crab.mp3")
+        pygame.mixer.music.play() 
 
 
     def run(self):
@@ -142,6 +139,8 @@ class GameView:
         else:
             if keys[pygame.K_r]:
                 self.__init__()
+                pygame.mixer.music.load("./data/music/Crab.mp3")
+                pygame.mixer.music.play() 
 
     def _move(self, key):
         for symptom, flag in self.player.symptoms.items():
