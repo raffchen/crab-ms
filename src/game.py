@@ -4,15 +4,17 @@ class Game:
     def __init__(self):
         self._running = True
         self._board = []
+        self.b_dict = {}
         self._init_board()
 
     def _init_board(self):
-        num_col = 6
-        num_row = 6
+        num_col = randrange(3,7)
+        num_row = randrange(4,8)
+        crab_pos = (randrange(num_col),randrange(1,num_row+1))
         for row in range(num_row):
             col_lst = []
             for col in range(num_col+2):
-                if(row == 0 and col == 1):
+                if(row == crab_pos(0) and col == crab_pos(1)):
                     col_lst.append('c')
                 elif(col in [0, num_col+1]):
                     col_lst.append('|')
