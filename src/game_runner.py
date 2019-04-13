@@ -1,5 +1,4 @@
 import pygame
-from game import Game
 from pathlib import Path
 from random import random, choice, shuffle
 import map_generator
@@ -17,6 +16,12 @@ class Crab(Player):
         Player.__init__(self, image, size, location)
         self.health = 80
         self._location = location
+        self.symptoms = {
+            "loss-of-balance": {"status": False, "timer": 0},
+            "fatigue": {"status": False, "timer": 0},
+            "vision": {"status": False, "timer": 0},
+            "weakness": {"status": False, "timer": 0}
+        }
 
     def update_location(self, move):
         self._location = (self._location[0]+move[0], self._location[1]+move[1])
@@ -54,11 +59,14 @@ class Seagull(Player):
 
 
 class GameView:
-    def __init__(self, game_state):
-        self.game = game_state
+    def __init__(self):
+        self.running = True
         self.screen = pygame.display.set_mode((700, 450))
         self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
         self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
+        # TEST
+        self.player.symptoms['loss-of-balance']['status'] = True
+        # END TEST
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -73,6 +81,7 @@ class GameView:
                        Player(str(Path("./data/images/health7.png")), (216, 134), (237,-10)),\
                        Player(str(Path("./data/images/health8.png")), (216, 134), (237,-10))]
 
+        self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -81,7 +90,7 @@ class GameView:
 
         clock = pygame.time.Clock()
 
-        while self.game.running:
+        while self.running:
             for _ in range(4):
                 clock.tick(60)
                 self._handle_events()
@@ -108,7 +117,7 @@ class GameView:
     def _handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.game.running = False
+                self.running = False
         keys = pygame.key.get_pressed()
         if self.player.health > 0:
             if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -121,23 +130,52 @@ class GameView:
                 self._move("right")
         else:
             if keys[pygame.K_r]:
-                self.__init__(Game())
+                self.__init__()
 
     def _move(self, key):
-        moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+
         
-        #if random() < 0.20:
-         #    key = choice(["up", "left", "right", "down"])
-        
-      
+        # if random() < 0.20:
+        #     key = choice(["up", "left", "right", "down"])
+        #
+        # if not self.player.get_location() == (300, 200):
+        #     if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
+        #             or (key == "left" and not self.player.rect.left <= self.background.rect.left)
+        #             or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
+        #             or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+        #         self._character_move(key)
+        for symptom, flag in self.player.symptoms.items():
+            if flag["status"]:
+                # symptom do stuff
+                # maybe another dict??
+                if symptom == 'loss-of-balance':
+                    if flag["timer"] == 0:
+                        self._moves = self.moves.copy()
+                        self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
+                                          sorted(self.moves.values(), key=lambda x: random())))
+                        self.player.symptoms[symptom]["timer"] += 1
+                    elif flag["timer"] == 60:
+                        self.moves = self._moves
+                        del self._moves
+                        self.player.symptoms[symptom]["status"] = False
+                        self.player.symptoms[symptom]["timer"] = 0
+                        print(flag["timer"])
+                    else:
+                        self.player.symptoms[symptom]["timer"] += 1
+                        print(flag["timer"])
                 
-        if ((key == "up" and not self.player.rect.top <= self.background.rect.top+200)
-            or (key == "left" and not self.player.rect.left <= self.background.rect.left+300)
-            or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom-250)
-            or (key == "right" and not self.player.rect.right >= self.background.rect.right-350)):
-            self.background.rect = self.background.rect.move(*moves[key])
-        '''else:
-             self._character_move(key)'''
+        if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
+                or (key == "left" and not self.player.rect.left <= self.background.rect.left)
+                or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
+                or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+            self.background.rect = self.background.rect.move(*self.moves[key])
+            if self.moves[key][0] != 0:
+                map_generator.default_x_coord += self.moves[key][0]
+            elif self.moves[key][1] != 0:
+                map_generator.default_y_coord += self.moves[key][1]
+            
+        # else:
+        #     self._character_move(key)
 
         if random() > 0.9:
             self.player.health -= 1
@@ -160,6 +198,5 @@ class GameView:
              self.player.update_location(moves[key])
 
 if __name__ == '__main__':
-    game = Game()
-    view = GameView(game)
+    view = GameView()
     view.run()
