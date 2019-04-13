@@ -19,11 +19,9 @@ class Crab(Player):
 
     def update_location(self,move):
         self._location = (self._location[0]+move[0],self._location[1]+move[1])
-        
 
     def get_location(self):
         return self._location
-        
 
 
 class Seagull(Player):
@@ -115,10 +113,10 @@ class GameView:
                 self._character_move(key)
                 
         elif ((key == "up" and not self.player.rect.top <= self.background.rect.top+250)
-                    or (key == "left" and not self.player.rect.left <= self.background.rect.left+350)
-                    or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom-250)
-                    or (key == "right" and not self.player.rect.right >= self.background.rect.right-350)):
-                self.background.rect = self.background.rect.move(*moves[key])
+                or (key == "left" and not self.player.rect.left <= self.background.rect.left+350)
+                or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom-250)
+                or (key == "right" and not self.player.rect.right >= self.background.rect.right-350)):
+            self.background.rect = self.background.rect.move(*moves[key])
         else:
             self._character_move(key)
 
@@ -127,17 +125,22 @@ class GameView:
 
     def _character_move(self, key):
         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
-        if(key =='up'): key = 'down'
-        elif(key=='down'): key = 'up'
-        elif(key=='left'): key = 'right'
-        elif(key=='right'): key = 'left'
+        if key == 'up':
+            key = 'down'
+        elif key == 'down':
+            key = 'up'
+        elif key == 'left':
+            key = 'right'
+        elif key == 'right':
+            key = 'left'
         if ((key == "up" and not self.player.rect.top < self.background.rect.top)
-            or (key == "left" and not self.player.rect.left < self.background.rect.left)
-            or (key == "down" and not self.player.rect.bottom > self.background.rect.bottom)
-            or (key == "right" and not self.player.rect.right > self.background.rect.right)):
+                or (key == "left" and not self.player.rect.left < self.background.rect.left)
+                or (key == "down" and not self.player.rect.bottom > self.background.rect.bottom)
+                or (key == "right" and not self.player.rect.right > self.background.rect.right)):
             self.player.rect = self.player.rect.move(*moves[key])
             self.player.update_location(moves[key])
-            
+
+
 if __name__ == '__main__':
     game = Game()
     view = GameView(game)
