@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from random import random, choice, randint
+from random import random, choice, choices, randint
 import map_generator
 
 
@@ -67,6 +67,7 @@ class GameView:
         self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
         # TEST
         self.player.symptoms['loss-of-balance']['status'] = True
+        self.player.symptoms['fatigue']['status'] = True
         # END TEST
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -82,7 +83,8 @@ class GameView:
                        Player(str(Path("./data/images/health7.png")), (216, 134), (237, -10)),
                        Player(str(Path("./data/images/health8.png")), (216, 134), (237, -10))]
 
-        self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+        self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
+                      "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -141,7 +143,7 @@ class GameView:
                     self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
                                       sorted(self.moves.values(), key=lambda x: random())))
                     self.player.symptoms[symptom]["timer"] += 1
-                elif flag["timer"] == 60:
+                elif flag["timer"] == 150:
                     self.moves = self._moves
                     del self._moves
                     self.player.symptoms[symptom]["status"] = False
@@ -151,12 +153,19 @@ class GameView:
 
             elif symptom == 'fatigue' and flag["status"]:
                 if flag["timer"] == 0:
-                    self.player.speed = randint(0, 2)
+                    self.player.speed = choices([0, 1, 2, 3], [5, 10, 10, 25])[0]/4
+                    self.moves = {k: tuple(map(lambda x: int(x * self.player.speed), v)) for k, v in self.moves.items()}
                     self.player.symptoms[symptom]["timer"] += 1
-                elif flag["timer"] == 60:
+                elif flag["timer"] == 150:
                     self.player.speed = 4
                     self.player.symptoms[symptom]["status"] = False
                     self.player.symptoms[symptom]["timer"] = 0
+                    try:
+                        self.moves = {k: tuple(map(lambda x: int(x * self.player.speed/x), v))
+                                      for k, v in self.moves.items()}
+                    except ZeroDivisionError:
+                        self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
+                                      "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
                 else:
                     self.player.symptoms[symptom]["timer"] += 1
                 
