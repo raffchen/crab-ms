@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from random import random, choice, choices, randint
+from random import random, choice, choices
 import map_generator
 
 
@@ -73,15 +73,15 @@ class GameView:
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
-        self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (10,-30)),\
-                       Player(str(Path("./data/images/health1.png")), (216, 134), (10,-30)),\
-                       Player(str(Path("./data/images/health2.png")), (216, 134), (10,-30)),\
-                       Player(str(Path("./data/images/health3.png")), (216, 134), (10,-30)),\
-                       Player(str(Path("./data/images/health4.png")), (216, 134), (10,-30)),\
-                       Player(str(Path("./data/images/health5.png")), (216, 134), (10,-30)),\
-                       Player(str(Path("./data/images/health6.png")), (216, 134), (10,-30)),\
-                       Player(str(Path("./data/images/health7.png")), (216, 134), (10,-30)),\
-                       Player(str(Path("./data/images/health8.png")), (216, 134), (10,-30))]
+        self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (10, -30)),
+                       Player(str(Path("./data/images/health1.png")), (216, 134), (10, -30)),
+                       Player(str(Path("./data/images/health2.png")), (216, 134), (10, -30)),
+                       Player(str(Path("./data/images/health3.png")), (216, 134), (10, -30)),
+                       Player(str(Path("./data/images/health4.png")), (216, 134), (10, -30)),
+                       Player(str(Path("./data/images/health5.png")), (216, 134), (10, -30)),
+                       Player(str(Path("./data/images/health6.png")), (216, 134), (10, -30)),
+                       Player(str(Path("./data/images/health7.png")), (216, 134), (10, -30)),
+                       Player(str(Path("./data/images/health8.png")), (216, 134), (10, -30))]
 
         self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
                       "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
