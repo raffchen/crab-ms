@@ -15,12 +15,11 @@ class GameView:
         self.game = game_state
         self.screen = pygame.display.set_mode((700, 450))
         self.background = Player(str(Path("./data/images/grid.jpg")), (1000, 1000))
-        self.player = Player(str(Path("./data/images/crab.png")), (60, 60), (300, 200))
+        self.player = Player(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
 
     def run(self):
         """initializes, executes, and quits the pygame"""
         pygame.init()
-
         pygame.display.init()
 
         clock = pygame.time.Clock()
@@ -29,7 +28,6 @@ class GameView:
             clock.tick(60)
 
             self._handle_events()
-
             self._display_board()
 
         pygame.quit()
