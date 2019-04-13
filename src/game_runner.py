@@ -13,14 +13,14 @@ class Player:
 class Crab(Player):
     def __init__(self, image: str, size: tuple, location: tuple = (0, 0)):
         Player.__init__(self, image, size, location)
-        self.health = 10
+        self.health = 25
 
 
 class GameView:
     def __init__(self, game_state):
         self.game = game_state
         self.screen = pygame.display.set_mode((700, 450))
-        self.background = Player(str(Path("./data/images/grid.jpg")), (1000, 1000))
+        self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
         self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
 
