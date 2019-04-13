@@ -82,7 +82,18 @@ class GameView:
                        Player(str(Path("./data/images/health8.png")), (216, 134), (10,-30))]
 
         self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+        pygame.mixer.init()
+        pygame.mixer.music.set_volume(0.7)
+        pygame.mixer.music.load("./data/music/Intro.mp3")
+        pygame.mixer.music.play() 
+        
+             
+        
+        
+        
 
+        
+        
     def run(self):
         """initializes, executes, and quits the pygame"""
         pygame.init()
@@ -103,7 +114,6 @@ class GameView:
     def _display_board(self):
         """displays the board when it changes"""
         self.screen.fill(pygame.Color(0, 0, 0))
-        #self.screen.blit(self.background.img, self.background.rect)
         map_generator.loadLevel(self.screen, 'level1.txt')
         for gull in self.gulls:
             self.screen.blit(gull.img, gull.rect)
@@ -119,35 +129,25 @@ class GameView:
             if event.type == pygame.QUIT:
                 self.running = False
         keys = pygame.key.get_pressed()
-        if self.player.health > 0:
-            if keys[pygame.K_w] or keys[pygame.K_UP]:
-                self._move("up")
-            if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-                self._move("left")
-            if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-                self._move("down")
-            if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-                self._move("right")
-        else:
-            if keys[pygame.K_r]:
-                self.__init__()
+        if(keys):
+            if self.player.health > 0:
+                if keys[pygame.K_w] or keys[pygame.K_UP]:
+                    self._move("up")
+                if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+                    self._move("left")
+                if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+                    self._move("down")
+                if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+                    self._move("right")
+            else:
+                if keys[pygame.K_r]:
+                    self.__init__()
+                    pygame.mixer.music.load("./data/music/Crab.mp3")
+                    pygame.mixer.music.play() 
 
     def _move(self, key):
-
-        
-        # if random() < 0.20:
-        #     key = choice(["up", "left", "right", "down"])
-        #
-        # if not self.player.get_location() == (300, 200):
-        #     if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
-        #             or (key == "left" and not self.player.rect.left <= self.background.rect.left)
-        #             or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
-        #             or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
-        #         self._character_move(key)
         for symptom, flag in self.player.symptoms.items():
             if flag["status"]:
-                # symptom do stuff
-                # maybe another dict??
                 if symptom == 'loss-of-balance':
                     if flag["timer"] == 0:
                         self._moves = self.moves.copy()
@@ -161,7 +161,7 @@ class GameView:
                         self.player.symptoms[symptom]["timer"] = 0
                     else:
                         self.player.symptoms[symptom]["timer"] += 1
-  
+                
         if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
                 or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
@@ -171,29 +171,10 @@ class GameView:
                 map_generator.default_x_coord += self.moves[key][0]
             elif self.moves[key][1] != 0:
                 map_generator.default_y_coord += self.moves[key][1]
-            
-        # else:
-        #     self._character_move(key)
 
         if random() > 0.9:
             self.player.health -= 1
 
-    def _character_move(self, key):
-         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
-         if key == 'up':
-             key = 'down'
-         elif key == 'down':
-             key = 'up'
-         elif key == 'left':
-             key = 'right'
-         elif key == 'right':
-             key = 'left'
-         if ((key == "up" and self.player.rect.top < self.background.rect.top)
-                 or (key == "left" and self.player.rect.left > self.background.rect.left)
-                 or (key == "down" and self.player.rect.bottom > self.background.rect.bottom)
-                 or (key == "right" and self.player.rect.right < self.background.rect.right+72)):
-             self.player.rect = self.player.rect.move(*moves[key])
-             self.player.update_location(moves[key])
 
 if __name__ == '__main__':
     view = GameView()
