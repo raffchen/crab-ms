@@ -4,15 +4,24 @@ import pathlib
 import os
 from email.policy import default
 
-ABSOLUTE_BORDER_SIZE = 10
+ABSOLUTE_BORDER_SIZE = 18
 IMAGE_WIDTH = 75
 IMAGE_HEIGHT = 75
 
 GRASS = pygame.image.load('./data/images/grass.png')
 GRASS = pygame.transform.scale(GRASS, (IMAGE_WIDTH, IMAGE_HEIGHT))
 
-default_x_coord = 0
-default_y_coord = 0
+SAND = pygame.image.load('./data/images/sand.png')
+SAND = pygame.transform.scale(SAND, (IMAGE_WIDTH, IMAGE_HEIGHT))
+
+UNDERWATER = pygame.image.load('./data/images/underwater.png')
+UNDERWATER = pygame.transform.scale(UNDERWATER, (IMAGE_WIDTH, IMAGE_HEIGHT))
+
+DEFAULT_STARTING_Y_COORD = -300
+DEFAULT_STARTING_X_COORD = -300
+
+default_x_coord = DEFAULT_STARTING_X_COORD
+default_y_coord = DEFAULT_STARTING_Y_COORD
 
 def loadLevel(screen, level_name:str ):
     '''this function takes in a screen and a level_name, and then fetches it from local text files'''
@@ -70,6 +79,10 @@ def renderLevelArrayOnScreen(screen, level_array):
         for tile in row:
             if tile == 'GRASS':
                 screen.blit(GRASS, (x_coord, y_coord))
+            elif tile == 'SAND':
+                screen.blit(SAND, (x_coord, y_coord))
+            elif tile == 'UNDERWATER':
+                screen.blit(UNDERWATER, (x_coord, y_coord))
             x_coord += IMAGE_WIDTH
         y_coord += IMAGE_HEIGHT
         x_coord = default_x_coord

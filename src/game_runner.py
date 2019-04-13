@@ -16,6 +16,13 @@ class Crab(Player):
         Player.__init__(self, image, size, location)
         self.health = 80
         self._location = location
+        self._index = 0
+        self._standing_still_animation_frames = [
+            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png"))), (60, 60)),
+            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still1.png"))), (60, 60)),
+            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still2.png"))), (60, 60)),
+            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still3.png"))), (60, 60)),
+            ]
         self.symptoms = {
             "loss-of-balance": {"status": False, "timer": 0},
             "fatigue": {"status": False, "timer": 0},
@@ -29,6 +36,27 @@ class Crab(Player):
 
     def get_location(self):
         return self._location
+
+    def update(self):
+        if pygame.time.get_ticks()%5 == 0:
+            self._index += 1
+            if self._index >= len(self._standing_still_animation_frames):
+                self._index = 0
+            self.img = self._standing_still_animation_frames[self._index]
+
+
+class Pebble():
+    
+    img = pygame.transform.scale(pygame.image.load("./data/images/pebble.png"), (20, 20))
+    speed = 5
+    
+    def __init__(self, vector_direction, location):
+        self.vector_direction = vector_direction
+        self.location = location
+        
+    def update(self):
+        self.location = (self.location[0] + self.vector_direction[0]*Pebble.speed, self.location[1] + self.vector_direction[1]*Pebble.speed)
+
         
 
 class Seagull(Player):
@@ -69,6 +97,7 @@ class GameView:
         self.player.symptoms['loss-of-balance']['status'] = True
         self.player.symptoms['fatigue']['status'] = True
         # END TEST
+        self.pebbles = []
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -113,19 +142,28 @@ class GameView:
         self.screen.fill(pygame.Color(0, 0, 0))
         #self.screen.blit(self.background.img, self.background.rect)
         map_generator.loadLevel(self.screen, 'level1.txt')
-        for gull in self.gulls:
-            self.screen.blit(gull.img, gull.rect)
+        #for gull in self.gulls:
+        #    self.screen.blit(gull.img, gull.rect)
+        
+        for pebble in self.pebbles:
+            self.screen.blit(Pebble.img, pebble.location)
+            pebble.update()
         if self.player.health > 0:
+            self.player.update()
             self.screen.blit(self.player.img, self.player.rect)
+            
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
         self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
         pygame.display.flip()
+    
 
     def _handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.shoot(pygame.mouse.get_pos())
         keys = pygame.key.get_pressed()
         if self.player.health > 0:
             if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -141,6 +179,8 @@ class GameView:
                 self.__init__()
                 pygame.mixer.music.load("./data/music/Crab.mp3")
                 pygame.mixer.music.play() 
+                map_generator.default_x_coord = map_generator.DEFAULT_STARTING_X_COORD
+                map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
 
     def _move(self, key):
         for symptom, flag in self.player.symptoms.items():
@@ -187,7 +227,21 @@ class GameView:
                 map_generator.default_y_coord += self.moves[key][1]
 
         if random() > 0.9:
-            self.player.health -= 1
+            self.player.health -= 1        
+    
+    def shoot(self, mouse_click):
+        vector_direction = [0,0]
+        if self.player.get_location()[0] - mouse_click[0] < 0:
+            vector_direction[0] = 1
+        elif self.player.get_location()[0] - mouse_click[0] > 0:
+            vector_direction[0] = -1
+        if self.player.get_location()[1] - mouse_click[1] < 0:
+            vector_direction[1] = 1
+        elif self.player.get_location()[1] - mouse_click[1] > 0:
+            vector_direction[1] = -1
+        vector_direction = tuple(vector_direction)
+        if vector_direction != (0,0):
+            self.pebbles.append(Pebble(vector_direction, self.player.get_location()))
 
 
 if __name__ == '__main__':
