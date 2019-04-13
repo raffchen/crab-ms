@@ -17,10 +17,10 @@ class Crab(Player):
         self.health = 1000
         self._location = location
         self.symptoms = {
-            "loss-of-balance": False,
-            "fatigue": False,
-            "vision": False,
-            "weakness": False
+            "loss-of-balance": {"status": False, "timer": 0},
+            "fatigue": {"status": False, "timer": 0},
+            "vision": {"status": False, "timer": 0},
+            "weakness": {"status": False, "timer": 0}
         }
 
     def update_location(self, move):
@@ -65,7 +65,7 @@ class GameView:
         self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
         self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
         # TEST
-        self.player.symptoms['loss-of-balance'] = True
+        self.player.symptoms['loss-of-balance']['status'] = True
         # END TEST
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -134,13 +134,24 @@ class GameView:
         #             or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
         #         self._character_move(key)
         for symptom, flag in self.player.symptoms.items():
-            if flag:
+            if flag["status"]:
                 # symptom do stuff
                 # maybe another dict??
                 if symptom == 'loss-of-balance':
-                    self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
-                                      sorted(self.moves.values(), key=lambda x: random())))
-                    self.player.symptoms[symptom] = False
+                    if flag["timer"] == 0:
+                        self._moves = self.moves.copy()
+                        self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
+                                          sorted(self.moves.values(), key=lambda x: random())))
+                        self.player.symptoms[symptom]["timer"] += 1
+                    elif flag["timer"] == 60:
+                        self.moves = self._moves
+                        del self._moves
+                        self.player.symptoms[symptom]["status"] = False
+                        self.player.symptoms[symptom]["timer"] = 0
+                        print(flag["timer"])
+                    else:
+                        self.player.symptoms[symptom]["timer"] += 1
+                        print(flag["timer"])
                 
         if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
@@ -157,7 +168,6 @@ class GameView:
 
         if random() > 0.9:
             self.player.health -= 1
-            print(self.player.health)
 
     # def _character_move(self, key):
     #     moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
