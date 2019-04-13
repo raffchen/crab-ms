@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from random import random, choice, choices
+from random import random, choices
 import map_generator
 from crab import Crab
 from player import Player
@@ -95,7 +95,7 @@ class GameView:
                 self._move("right")
         else:
             if keys[pygame.K_r]:
-                self.__init__(Game())
+                self.__init__()
                 map_generator.default_x_coord = map_generator.DEFAULT_STARTING_X_COORD
                 map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
     
