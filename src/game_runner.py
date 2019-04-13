@@ -17,8 +17,8 @@ class Crab(Player):
         self.health = 25
         self._location = location
 
-    def update_location(self,move):
-        self._location = (self._location[0]+move[0],self._location[1]+move[1])
+    def update_location(self, move):
+        self._location = (self._location[0]+move[0], self._location[1]+move[1])
 
     def get_location(self):
         return self._location
@@ -27,15 +27,15 @@ class Crab(Player):
 class Seagull(Player):
     def __init__(self, image: str, size: tuple, background, location: tuple = (0, 0)):
         Player.__init__(self, image, size, location)
-        self.direction = choice(["up","left", "down", "right"])
+        self.direction = choice(["up", "left", "down", "right"])
         self.background = background
 
     def move(self):
         moves = {"up": (0, -4), "left": (-4, 0), "down": (0, 4), "right": (4, 0)}
         if ((self.direction == "up" and not self.rect.top <= self.background.rect.top+350)
-            or (self.direction == "left" and not self.rect.left <= self.background.rect.left+250)
-            or (self.direction == "down" and not self.rect.bottom >= self.background.rect.bottom-350)
-            or (self.direction == "right" and not self.rect.right >= self.background.rect.right-250)):
+                or (self.direction == "left" and not self.rect.left <= self.background.rect.left+250)
+                or (self.direction == "down" and not self.rect.bottom >= self.background.rect.bottom-350)
+                or (self.direction == "right" and not self.rect.right >= self.background.rect.right-250)):
             self.rect = self.rect.move(*moves[self.direction])
         else:
             self.direction = choice(["up", "left", "down", "right"])
@@ -60,10 +60,9 @@ class GameView:
         clock = pygame.time.Clock()
 
         while self.game.running:
-            for num in range(4):
-                clock.tick(60)
-                self._handle_events()
-                self._display_board()
+            clock.tick(60)
+            self._handle_events()
+            self._display_board()
             for gull in self.gulls:
                 gull.move()
                 self._display_board()
@@ -103,9 +102,9 @@ class GameView:
         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
         
         if random() < 0.20:
-            key = choice(["up","left","right","down"])
+            key = choice(["up", "left", "right", "down"])
 
-        if not self.player.get_location() == (300,200):
+        if not self.player.get_location() == (300, 200):
             if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                     or (key == "left" and not self.player.rect.left <= self.background.rect.left)
                     or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
@@ -121,7 +120,7 @@ class GameView:
             self._character_move(key)
 
         if random() > 0.99:
-            self.player.health -=1
+            self.player.health -= 1
 
     def _character_move(self, key):
         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
