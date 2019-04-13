@@ -11,6 +11,9 @@ IMAGE_HEIGHT = 75
 GRASS = pygame.image.load('./data/images/grass.png')
 GRASS = pygame.transform.scale(GRASS, (IMAGE_WIDTH, IMAGE_HEIGHT))
 
+SAND = pygame.image.load('./data/images/sand.png')
+SAND = pygame.transform.scale(SAND, (IMAGE_WIDTH, IMAGE_HEIGHT))
+
 default_x_coord = 0
 default_y_coord = 0
 
@@ -70,6 +73,8 @@ def renderLevelArrayOnScreen(screen, level_array):
         for tile in row:
             if tile == 'GRASS':
                 screen.blit(GRASS, (x_coord, y_coord))
+            elif tile == 'SAND':
+                screen.blit(SAND, (x_coord, y_coord))
             x_coord += IMAGE_WIDTH
         y_coord += IMAGE_HEIGHT
         x_coord = default_x_coord

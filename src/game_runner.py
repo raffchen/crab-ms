@@ -15,13 +15,30 @@ class Crab(Player):
         Player.__init__(self, image, size, location)
         self.health = 1000
         self._location = location
-
+        self._index = 0
+        
+        self._standing_still_animation_frames = [
+            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png"))), (60, 60)),
+            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still1.png"))), (60, 60)),
+            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still2.png"))), (60, 60)),
+            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still3.png"))), (60, 60)),
+            ]
+        
     def update_location(self,move):
         self._location = (self._location[0]+move[0],self._location[1]+move[1])
         
 
     def get_location(self):
         return self._location
+    
+    def update(self):
+        if pygame.time.get_ticks()%5 == 0:
+            self._index += 1
+            if self._index >= len(self._standing_still_animation_frames):
+                self._index = 0
+            self.img = self._standing_still_animation_frames[self._index]
+
+            
         
 
 class Seagull(Player):
@@ -79,12 +96,12 @@ class GameView:
     def __init__(self, game_state):
         self.game = game_state
         self.screen = pygame.display.set_mode((700, 450))
-        self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
-        self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
+        self.background = Player(str(Path("./data/images/beach.jpg")), (map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_WIDTH, map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_HEIGHT))
+        self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (60, 60), (300, 200))
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
-        self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
-                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
-                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
+        #self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+        #              Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+        #              Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -98,9 +115,9 @@ class GameView:
                 clock.tick(60)
                 self._handle_events()
                 self._display_board()
-            for gull in self.gulls:
-                gull.move()
-                self._display_board()
+            #for gull in self.gulls:
+            #    gull.move()
+            #    self._display_board()
         pygame.quit()  
 
     def _display_board(self):
@@ -108,10 +125,12 @@ class GameView:
         self.screen.fill(pygame.Color(255, 255, 255))
         #self.screen.blit(self.background.img, self.background.rect)
         map_generator.loadLevel(self.screen, 'level1.txt')
-        for gull in self.gulls:
-            self.screen.blit(gull.img, gull.rect)
+        #for gull in self.gulls:
+        #    self.screen.blit(gull.img, gull.rect)
         if self.player.health > 0:
+            self.player.update()
             self.screen.blit(self.player.img, self.player.rect)
+            
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
         pygame.display.flip()
