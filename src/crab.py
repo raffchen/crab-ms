@@ -31,7 +31,7 @@ class Crab(Player):
         return self._location
 
     def update(self):
-        if pygame.time.get_ticks()%5 == 0:
+        if pygame.time.get_ticks() % 5 == 0:
             self._index += 1
             if self._index >= len(self._standing_still_animation_frames):
                 self._index = 0
