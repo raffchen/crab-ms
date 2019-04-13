@@ -83,7 +83,7 @@ class GameView:
 
         self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
         pygame.mixer.init()
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.set_volume(0.7)
         song1 = pygame.mixer.music.load("./data/music/Intro.mp3")
         pygame.mixer.music.play(1)
         pygame.mixer.music.queue("./data/music/Crab.mp3")
