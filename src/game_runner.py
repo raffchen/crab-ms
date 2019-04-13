@@ -19,6 +19,9 @@ class GameView:
         self.player.symptoms['fatigue']['status'] = False
         # END TEST
         self.pebbles = []
+        self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
+                       Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
+                       Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         '''self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -38,7 +41,7 @@ class GameView:
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
-        pygame.mixer.music.play()
+        pygame.mixer.music.play() 
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -71,6 +74,7 @@ class GameView:
             
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
+        self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
         self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
         pygame.display.flip()
 
@@ -93,6 +97,8 @@ class GameView:
         else:
             if keys[pygame.K_r]:
                 self.__init__()
+                pygame.mixer.music.load("./data/music/Crab.mp3")
+                pygame.mixer.music.play() 
                 map_generator.default_x_coord = map_generator.DEFAULT_STARTING_X_COORD
                 map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
     
