@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from random import random, choice, shuffle
+from random import random, choice, choices, randint
 import map_generator
 
 
@@ -22,6 +22,7 @@ class Crab(Player):
             "vision": {"status": False, "timer": 0},
             "weakness": {"status": False, "timer": 0}
         }
+        self.speed = 4
 
     def update_location(self, move):
         self._location = (self._location[0]+move[0], self._location[1]+move[1])
@@ -66,6 +67,7 @@ class GameView:
         self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
         # TEST
         self.player.symptoms['loss-of-balance']['status'] = True
+        self.player.symptoms['fatigue']['status'] = True
         # END TEST
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -81,13 +83,16 @@ class GameView:
                        Player(str(Path("./data/images/health7.png")), (216, 134), (10,-30)),\
                        Player(str(Path("./data/images/health8.png")), (216, 134), (10,-30))]
 
-        self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+        self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
+                      "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
+
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         song1 = pygame.mixer.music.load("./data/music/Intro.mp3")
         pygame.mixer.music.play(1)
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.queue("./data/music/Crab.mp3")
+
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -140,22 +145,37 @@ class GameView:
 
     def _move(self, key):
         for symptom, flag in self.player.symptoms.items():
-            if flag["status"]:
-                if symptom == 'loss-of-balance':
-                    if flag["timer"] == 0:
-                        self._moves = self.moves.copy()
-                        self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
-                                          sorted(self.moves.values(), key=lambda x: random())))
-                        self.player.symptoms[symptom]["timer"] += 1
-                    elif flag["timer"] == 60:
-                        self.moves = self._moves
-                        del self._moves
-                        self.player.symptoms[symptom]["status"] = False
-                        self.player.symptoms[symptom]["timer"] = 0
-                        print(flag["timer"])
-                    else:
-                        self.player.symptoms[symptom]["timer"] += 1
-                        print(flag["timer"])
+            if symptom == 'loss-of-balance' and flag["status"]:
+                if flag["timer"] == 0:
+                    self._moves = self.moves.copy()
+                    self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
+                                      sorted(self.moves.values(), key=lambda x: random())))
+                    self.player.symptoms[symptom]["timer"] += 1
+                elif flag["timer"] == 150:
+                    self.moves = self._moves
+                    del self._moves
+                    self.player.symptoms[symptom]["status"] = False
+                    self.player.symptoms[symptom]["timer"] = 0
+                else:
+                    self.player.symptoms[symptom]["timer"] += 1
+
+            elif symptom == 'fatigue' and flag["status"]:
+                if flag["timer"] == 0:
+                    self.player.speed = choices([0, 1, 2, 3], [5, 10, 10, 25])[0]/4
+                    self.moves = {k: tuple(map(lambda x: int(x * self.player.speed), v)) for k, v in self.moves.items()}
+                    self.player.symptoms[symptom]["timer"] += 1
+                elif flag["timer"] == 150:
+                    self.player.speed = 4
+                    self.player.symptoms[symptom]["status"] = False
+                    self.player.symptoms[symptom]["timer"] = 0
+                    try:
+                        self.moves = {k: tuple(map(lambda x: int(x * self.player.speed/x), v))
+                                      for k, v in self.moves.items()}
+                    except ZeroDivisionError:
+                        self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
+                                      "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
+                else:
+                    self.player.symptoms[symptom]["timer"] += 1
                 
         if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
