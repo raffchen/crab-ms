@@ -1,5 +1,4 @@
 import pygame
-from game import Game
 from pathlib import Path
 from random import random, choice, shuffle
 import map_generator
@@ -17,6 +16,12 @@ class Crab(Player):
         Player.__init__(self, image, size, location)
         self.health = 1000
         self._location = location
+        self.symptoms = {
+            "loss-of-balance": False,
+            "fatigue": False,
+            "vision": False,
+            "weakness": False
+        }
 
     def update_location(self, move):
         self._location = (self._location[0]+move[0], self._location[1]+move[1])
@@ -54,11 +59,14 @@ class Seagull(Player):
 
 
 class GameView:
-    def __init__(self, game_state):
-        self.game = game_state
+    def __init__(self):
+        self.running = True
         self.screen = pygame.display.set_mode((700, 450))
         self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
         self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
+        # TEST
+        self.player.symptoms['loss-of-balance'] = True
+        # END TEST
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -71,7 +79,7 @@ class GameView:
 
         clock = pygame.time.Clock()
 
-        while self.game.running:
+        while self.running:
             for _ in range(4):
                 clock.tick(60)
                 self._handle_events()
@@ -97,7 +105,7 @@ class GameView:
     def _handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.game.running = False
+                self.running = False
         keys = pygame.key.get_pressed()
         if self.player.health > 0:
             if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -110,7 +118,7 @@ class GameView:
                 self._move("right")
         else:
             if keys[pygame.K_r]:
-                self.__init__(Game())
+                self.__init__()
 
     def _move(self, key):
         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
@@ -124,6 +132,11 @@ class GameView:
         #             or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
         #             or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
         #         self._character_move(key)
+        for symptom, flag in self.player.symptoms.items():
+            if flag:
+                # symptom do stuff
+                # maybe another dict??
+                pass
                 
         if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
@@ -161,6 +174,5 @@ class GameView:
 
 
 if __name__ == '__main__':
-    game = Game()
-    view = GameView(game)
+    view = GameView()
     view.run()
