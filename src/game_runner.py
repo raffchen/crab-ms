@@ -20,6 +20,7 @@ class GameView:
     def run(self):
         """initializes, executes, and quits the pygame"""
         pygame.init()
+
         pygame.display.init()
 
         clock = pygame.time.Clock()
@@ -28,6 +29,7 @@ class GameView:
             clock.tick(60)
 
             self._handle_events()
+
             self._display_board()
 
         pygame.quit()
