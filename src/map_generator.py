@@ -1,7 +1,18 @@
 # this module renders a level onto a screen
 import pygame 
+import pathlib
+import os
+from email.policy import default
 
 ABSOLUTE_BORDER_SIZE = 10
+IMAGE_WIDTH = 75
+IMAGE_HEIGHT = 75
+
+GRASS = pygame.image.load('./data/images/grass.png')
+GRASS = pygame.transform.scale(GRASS, (IMAGE_WIDTH, IMAGE_HEIGHT))
+
+default_x_coord = 0
+default_y_coord = 0
 
 def loadLevel(screen, level_name:str ):
     '''this function takes in a screen and a level_name, and then fetches it from local text files'''
@@ -42,7 +53,7 @@ def convertFileToLevelArray(level_file):
         translated_array.append(new_row)
         
     #prints each individual row of the array
-    printArray(translated_array)
+    #printArray(translated_array)
     return translated_array
             
 def printArray(l:list):
@@ -52,7 +63,14 @@ def printArray(l:list):
         
 def renderLevelArrayOnScreen(screen, level_array):
     #waiting on seeing how screen is implemented in game_runner before adding
-    pass
+    x_coord = default_x_coord
+    y_coord = default_y_coord
     
+    for row in level_array:
+        for tile in row:
+            if tile == 'GRASS':
+                screen.blit(GRASS, (x_coord, y_coord))
+            x_coord += IMAGE_WIDTH
+        y_coord += IMAGE_HEIGHT
+        x_coord = default_x_coord
     
-loadLevel(None, 'level1.txt')

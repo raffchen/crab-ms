@@ -2,7 +2,7 @@ import pygame
 from game import Game
 from pathlib import Path
 from random import random,choice
-
+import map_generator
 
 class Player:
     def __init__(self, image: str, size: tuple, location: tuple = (0, 0)):
@@ -106,7 +106,8 @@ class GameView:
     def _display_board(self):
         """displays the board when it changes"""
         self.screen.fill(pygame.Color(255, 255, 255))
-        self.screen.blit(self.background.img, self.background.rect)
+        #self.screen.blit(self.background.img, self.background.rect)
+        map_generator.loadLevel(self.screen, 'level1.txt')
         for gull in self.gulls:
             self.screen.blit(gull.img, gull.rect)
         if self.player.health > 0:
@@ -151,6 +152,11 @@ class GameView:
                 or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
                 or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
             self.background.rect = self.background.rect.move(*moves[key])
+            if moves[key][0] != 0:
+                map_generator.default_x_coord += moves[key][0]
+            elif moves[key][1] != 0:
+                map_generator.default_y_coord += moves[key][1]
+            
         # else:
         #     self._character_move(key)
 
