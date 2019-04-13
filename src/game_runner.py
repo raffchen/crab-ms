@@ -88,8 +88,8 @@ class GameView:
 
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
-        song1 = pygame.mixer.music.load("./data/music/Intro.mp3")
-        pygame.mixer.music.play(1)
+        pygame.mixer.music.load("./data/music/Intro.mp3")
+        pygame.mixer.music.play(0)
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.queue("./data/music/Crab.mp3")
 
