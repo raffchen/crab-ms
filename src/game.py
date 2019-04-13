@@ -2,7 +2,7 @@ from random import randrange
 
 class Game:
     def __init__(self):
-        self._running = True
+        self.running = True
         self._board = []
         self.b_dict = {}
         self._init_board()
