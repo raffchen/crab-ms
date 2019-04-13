@@ -1,7 +1,7 @@
 import pygame
-from pathlib import Path
 
-class Pebble():
+
+class Pebble:
     
     img = pygame.transform.scale(pygame.image.load("./data/images/pebble.png"), (20, 20))
     speed = 5
@@ -11,4 +11,5 @@ class Pebble():
         self.location = location
         
     def update(self):
-        self.location = (self.location[0] + self.vector_direction[0]*Pebble.speed, self.location[1] + self.vector_direction[1]*Pebble.speed)
+        self.location = (self.location[0] + self.vector_direction[0]*Pebble.speed,
+                         self.location[1] + self.vector_direction[1]*Pebble.speed)

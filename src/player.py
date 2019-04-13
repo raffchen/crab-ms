@@ -1,5 +1,5 @@
-from pathlib import Path
 import pygame
+
 
 class Player:
     def __init__(self, image: str, size: tuple, location: tuple = (0, 0)):
