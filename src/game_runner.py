@@ -1,5 +1,4 @@
 import pygame
-from game import Game
 from pathlib import Path
 from random import random, choice, shuffle
 import map_generator
@@ -17,31 +16,18 @@ class Crab(Player):
         Player.__init__(self, image, size, location)
         self.health = 80
         self._location = location
+        self.symptoms = {
+            "loss-of-balance": {"status": False, "timer": 0},
+            "fatigue": {"status": False, "timer": 0},
+            "vision": {"status": False, "timer": 0},
+            "weakness": {"status": False, "timer": 0}
+        }
 
-        self._index = 0
-        
-        self._standing_still_animation_frames = [
-            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png"))), (60, 60)),
-            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still1.png"))), (60, 60)),
-            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still2.png"))), (60, 60)),
-            pygame.transform.scale(pygame.image.load(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still3.png"))), (60, 60)),
-            ]
-        
-    def update_location(self,move):
-        self._location = (self._location[0]+move[0],self._location[1]+move[1])
-       
+    def update_location(self, move):
+        self._location = (self._location[0]+move[0], self._location[1]+move[1])
 
     def get_location(self):
         return self._location
-    
-    def update(self):
-        if pygame.time.get_ticks()%5 == 0:
-            self._index += 1
-            if self._index >= len(self._standing_still_animation_frames):
-                self._index = 0
-            self.img = self._standing_still_animation_frames[self._index]
-
-            
         
 
 class Seagull(Player):
@@ -73,17 +59,18 @@ class Seagull(Player):
 
 
 class GameView:
-    def __init__(self, game_state):
-        self.game = game_state
+    def __init__(self):
+        self.running = True
         self.screen = pygame.display.set_mode((700, 450))
-        self.background = Player(str(Path("./data/images/beach.jpg")), (map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_WIDTH, map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_HEIGHT))
-        self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (60, 60), (300, 200))
+        self.background = Player(str(Path("./data/images/beach.jpg")), (1156, 1300))
+        self.player = Crab(str(Path("./data/images/crab.png")), (72, 44), (300, 200))
+        # TEST
+        self.player.symptoms['loss-of-balance']['status'] = True
+        # END TEST
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
-
-        #self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
-        #              Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
-        #              Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
-
+        self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
         self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (237,-10)),\
                        Player(str(Path("./data/images/health1.png")), (216, 134), (237,-10)),\
                        Player(str(Path("./data/images/health2.png")), (216, 134), (237,-10)),\
@@ -94,6 +81,8 @@ class GameView:
                        Player(str(Path("./data/images/health7.png")), (216, 134), (237,-10)),\
                        Player(str(Path("./data/images/health8.png")), (216, 134), (237,-10))]
 
+        self.moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+
     def run(self):
         """initializes, executes, and quits the pygame"""
         pygame.init()
@@ -101,14 +90,14 @@ class GameView:
 
         clock = pygame.time.Clock()
 
-        while self.game.running:
+        while self.running:
             for _ in range(4):
                 clock.tick(60)
                 self._handle_events()
                 self._display_board()
-            #for gull in self.gulls:
-            #    gull.move()
-            #    self._display_board()
+            for gull in self.gulls:
+                gull.move()
+                self._display_board()
         pygame.quit()  
 
     def _display_board(self):
@@ -116,12 +105,10 @@ class GameView:
         self.screen.fill(pygame.Color(255, 255, 255))
         #self.screen.blit(self.background.img, self.background.rect)
         map_generator.loadLevel(self.screen, 'level1.txt')
-        #for gull in self.gulls:
-        #    self.screen.blit(gull.img, gull.rect)
+        for gull in self.gulls:
+            self.screen.blit(gull.img, gull.rect)
         if self.player.health > 0:
-            self.player.update()
             self.screen.blit(self.player.img, self.player.rect)
-            
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
         self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
@@ -130,7 +117,7 @@ class GameView:
     def _handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.game.running = False
+                self.running = False
         keys = pygame.key.get_pressed()
         if self.player.health > 0:
             if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -143,44 +130,73 @@ class GameView:
                 self._move("right")
         else:
             if keys[pygame.K_r]:
-                self.__init__(Game())
+                self.__init__()
 
     def _move(self, key):
-        moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
-        if(random()<0.20):
-            key = choice(["up","left","right","down"])
-        if(not self.player.get_location() == (300,200)):
-            if((key == "up" and not self.player.rect.top <= self.background.rect.top)
+
+        
+        # if random() < 0.20:
+        #     key = choice(["up", "left", "right", "down"])
+        #
+        # if not self.player.get_location() == (300, 200):
+        #     if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
+        #             or (key == "left" and not self.player.rect.left <= self.background.rect.left)
+        #             or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
+        #             or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+        #         self._character_move(key)
+        for symptom, flag in self.player.symptoms.items():
+            if flag["status"]:
+                # symptom do stuff
+                # maybe another dict??
+                if symptom == 'loss-of-balance':
+                    if flag["timer"] == 0:
+                        self._moves = self.moves.copy()
+                        self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
+                                          sorted(self.moves.values(), key=lambda x: random())))
+                        self.player.symptoms[symptom]["timer"] += 1
+                    elif flag["timer"] == 60:
+                        self.moves = self._moves
+                        del self._moves
+                        self.player.symptoms[symptom]["status"] = False
+                        self.player.symptoms[symptom]["timer"] = 0
+                        print(flag["timer"])
+                    else:
+                        self.player.symptoms[symptom]["timer"] += 1
+                        print(flag["timer"])
+                
+        if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
                 or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
                 or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
-                self._character_move(key)
+            self.background.rect = self.background.rect.move(*self.moves[key])
+            if self.moves[key][0] != 0:
+                map_generator.default_x_coord += self.moves[key][0]
+            elif self.moves[key][1] != 0:
+                map_generator.default_y_coord += self.moves[key][1]
             
-                
-        elif ((key == "up" and not self.player.rect.top <= self.background.rect.top+250)
-                    or (key == "left" and not self.player.rect.left <= self.background.rect.left+350)
-                    or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom-250)
-                    or (key == "right" and not self.player.rect.right >= self.background.rect.right-350)):
-                self.background.rect = self.background.rect.move(*moves[key])
-        else:
-            self._character_move(key)
-        if(random()>0.9):
-            self.player.health -=1
+        # else:
+        #     self._character_move(key)
+
+        if random() > 0.9:
+            self.player.health -= 1
 
     def _character_move(self, key):
-        moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
-        if(key =='up'): key = 'down'
-        elif(key=='down'): key = 'up'
-        elif(key=='left'): key = 'right'
-        elif(key=='right'): key = 'left'
-        if ((key == "up" and not self.player.rect.top < self.background.rect.top)
-            or (key == "left" and not self.player.rect.left < self.background.rect.left)
-            or (key == "down" and not self.player.rect.bottom > self.background.rect.bottom)
-            or (key == "right" and not self.player.rect.right > self.background.rect.right)):
-            self.player.rect = self.player.rect.move(*moves[key])
-            self.player.update_location(moves[key])
+         moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+         if key == 'up':
+             key = 'down'
+         elif key == 'down':
+             key = 'up'
+         elif key == 'left':
+             key = 'right'
+         elif key == 'right':
+             key = 'left'
+         if ((key == "up" and self.player.rect.top < self.background.rect.top)
+                 or (key == "left" and self.player.rect.left > self.background.rect.left)
+                 or (key == "down" and self.player.rect.bottom > self.background.rect.bottom)
+                 or (key == "right" and self.player.rect.right < self.background.rect.right+72)):
+             self.player.rect = self.player.rect.move(*moves[key])
+             self.player.update_location(moves[key])
 
 if __name__ == '__main__':
-    game = Game()
-    view = GameView(game)
+    view = GameView()
     view.run()
