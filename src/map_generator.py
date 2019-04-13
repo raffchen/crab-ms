@@ -4,7 +4,9 @@ import pathlib
 import os
 from email.policy import default
 
+
 ABSOLUTE_BORDER_SIZE = 18
+
 IMAGE_WIDTH = 75
 IMAGE_HEIGHT = 75
 

@@ -2,7 +2,36 @@ import pygame
 from pathlib import Path
 from random import random, choice, choices
 import map_generator
+from crab import Crab
+from player import Player
+from seagull import Seagull
+from pebble import Pebble
 
+
+class GameView:
+    def __init__(self, game_state):
+        self.game = game_state
+        self.screen = pygame.display.set_mode((int(0.6*map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_WIDTH), int(0.6*map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_HEIGHT)))
+        self.background = Player(str(Path("./data/images/beach.jpg")), (int(0.5*map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_WIDTH), int(0.5*map_generator.ABSOLUTE_BORDER_SIZE*map_generator.IMAGE_HEIGHT)))
+        self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (10, 10), (300, 200))
+        self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
+        
+        self.pebbles = []
+        
+        #self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+        #              Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+        #              Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
+
+        self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health1.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health2.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health3.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health4.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health5.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health6.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health7.png")), (216, 134), (237,-10)),\
+                       Player(str(Path("./data/images/health8.png")), (216, 134), (237,-10))]
+        
 
 class Player:
     def __init__(self, image: str, size: tuple, location: tuple = (0, 0)):
@@ -176,6 +205,48 @@ class GameView:
                 self._move("right")
         else:
             if keys[pygame.K_r]:
+                self.__init__(Game())
+                map_generator.default_x_coord = map_generator.DEFAULT_STARTING_X_COORD
+                map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
+    
+    def shoot(self, mouse_click):
+        vector_direction = [0,0]
+        if self.player.get_location()[0] - mouse_click[0] < 0:
+            vector_direction[0] = 1
+        elif self.player.get_location()[0] - mouse_click[0] > 0:
+            vector_direction[0] = -1
+        if self.player.get_location()[1] - mouse_click[1] < 0:
+            vector_direction[1] = 1
+        elif self.player.get_location()[1] - mouse_click[1] > 0:
+            vector_direction[1] = -1
+        vector_direction = tuple(vector_direction)
+        vector_direction = (1,0)
+        if vector_direction != (0,0):
+            self.pebbles.append(Pebble(vector_direction, self.player.get_location()))
+
+    def _move(self, key):
+        moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
+        
+        #if random() < 0.20:
+         #    key = choice(["up", "left", "right", "down"])
+                
+        if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
+            or (key == "left" and not self.player.rect.left <= self.background.rect.left)
+            or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
+            or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+            self.background.rect = self.background.rect.move(*moves[key])
+            if moves[key][0] != 0:
+                map_generator.default_x_coord += moves[key][0]
+            elif moves[key][1] != 1:
+                map_generator.default_y_coord += moves[key][1]
+        
+        for pebble in self.pebbles:
+            if moves[key][0] != 0:
+                pebble.location = (pebble.location[0] + moves[key][0], pebble.location[1])
+            elif moves[key][1] != 1:
+                pebble.location = (pebble.location[0], pebble.location[1] + moves[key][1])
+                '''else:
+                     self._character_move(key)'''
                 self.__init__()
                 pygame.mixer.music.load("./data/music/Crab.mp3")
                 pygame.mixer.music.play() 
