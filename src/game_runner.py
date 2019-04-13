@@ -12,17 +12,16 @@ class Player:
 
 class GameView:
     def __init__(self, game_state):
-        self.size_tuple = (700, 450)
         self.game = game_state
+        self.screen = pygame.display.set_mode((700, 450))
         self.background = Player(str(Path("./data/images/grid.jpg")), (1000, 1000))
-        self.player = Player(str(Path("./data/images/crab.png")), (80, 80), (300, 200))
+        self.player = Player(str(Path("./data/images/crab.png")), (60, 60), (300, 200))
 
     def run(self):
         """initializes, executes, and quits the pygame"""
         pygame.init()
         pygame.display.init()
 
-        self._resize_screen(self.size_tuple)
         clock = pygame.time.Clock()
 
         while self.game.running:
@@ -44,32 +43,30 @@ class GameView:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.game.running = False
-            elif event.type == pygame.VIDEORESIZE:
-                self._resize_screen(event.size)
 
         keys = pygame.key.get_pressed()
 
-        if keys[pygame.K_w]:
-            self._move("w")
-        if keys[pygame.K_a]:
-            self._move("a")
-        if keys[pygame.K_s]:
-            self._move("s")
-        if keys[pygame.K_d]:
-            self._move("d")
+        if keys[pygame.K_w] or keys[pygame.K_UP]:
+            self._move("up")
+        if keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            self._move("left")
+        if keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            self._move("down")
+        if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            self._move("right")
 
     def _move(self, key):
-        moves = {"w": (0, 4), "a": (4, 0), "s": (0, -4), "d": (-4, 0)}
+        moves = {"up": (0, 4), "left": (4, 0), "down": (0, -4), "right": (-4, 0)}
 
         self.screen.fill(pygame.Color(255, 255, 255))
-        self.background.rect = self.background.rect.move(*moves[key])
+        if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
+                or (key == "left" and not self.player.rect.left <= self.background.rect.left)
+                or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
+                or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+            self.background.rect = self.background.rect.move(*moves[key])
         self.screen.blit(self.background.img, self.background.rect)
         self.screen.blit(self.player.img, self.player.rect)
         pygame.display.flip()
-
-    def _resize_screen(self, size: (int, int)) -> None:
-        """changes the size of the game screen"""
-        self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
 
 if __name__ == '__main__':

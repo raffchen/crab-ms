@@ -14,9 +14,9 @@ class Game:
         for row in range(num_row):
             col_lst = []
             for col in range(num_col+2):
-                if(row == crab_pos[1] and col == crab_pos[0]):
+                if row == crab_pos[1] and col == crab_pos[0]:
                     col_lst.append('c')
-                elif(col in [0, num_col+1]):
+                elif col in [0, num_col+1]:
                     col_lst.append('|')
                 else:
                     col_lst.append(' ')
