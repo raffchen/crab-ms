@@ -93,7 +93,6 @@ class GameView:
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.queue("./data/music/Crab.mp3")
 
-
     def run(self):
         """initializes, executes, and quits the pygame"""
         pygame.init()
@@ -114,7 +113,7 @@ class GameView:
     def _display_board(self):
         """displays the board when it changes"""
         self.screen.fill(pygame.Color(0, 0, 0))
-        #self.screen.blit(self.background.img, self.background.rect)
+        # self.screen.blit(self.background.img, self.background.rect)
         map_generator.loadLevel(self.screen, 'level1.txt')
         for gull in self.gulls:
             self.screen.blit(gull.img, gull.rect)
@@ -142,6 +141,9 @@ class GameView:
         else:
             if keys[pygame.K_r]:
                 self.__init__()
+
+    def _handle_symptoms(self):
+        pass
 
     def _move(self, key):
         for symptom, flag in self.player.symptoms.items():
