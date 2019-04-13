@@ -12,7 +12,9 @@ class Player:
 
 class GameView:
     def __init__(self, game_state):
+
         self.size_tuple = (700, 450)
+
         self.game = game_state
         self.background = Player(str(Path("./data/images/grid.jpg")), (1000, 1000))
         self.player = Player(str(Path("./data/images/crab.png")), (80, 80), (300, 200))
@@ -20,6 +22,7 @@ class GameView:
     def run(self):
         """initializes, executes, and quits the pygame"""
         pygame.init()
+
         pygame.display.init()
 
         self._resize_screen(self.size_tuple)
@@ -29,6 +32,7 @@ class GameView:
             clock.tick(60)
 
             self._handle_events()
+
             self._display_board()
 
         pygame.quit()
@@ -68,7 +72,7 @@ class GameView:
         pygame.display.flip()
 
     def _resize_screen(self, size: (int, int)) -> None:
-        """changes the size of the game screen"""
+      """changes the size of the game screen"""
         self.screen = pygame.display.set_mode(size, pygame.RESIZABLE)
 
 
