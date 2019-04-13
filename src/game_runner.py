@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from random import random, choice, shuffle
+from random import random, choice, randint
 import map_generator
 
 
@@ -22,6 +22,7 @@ class Crab(Player):
             "vision": {"status": False, "timer": 0},
             "weakness": {"status": False, "timer": 0}
         }
+        self.speed = 4
 
     def update_location(self, move):
         self._location = (self._location[0]+move[0], self._location[1]+move[1])
@@ -134,22 +135,30 @@ class GameView:
 
     def _move(self, key):
         for symptom, flag in self.player.symptoms.items():
-            if flag["status"]:
-                if symptom == 'loss-of-balance':
-                    if flag["timer"] == 0:
-                        self._moves = self.moves.copy()
-                        self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
-                                          sorted(self.moves.values(), key=lambda x: random())))
-                        self.player.symptoms[symptom]["timer"] += 1
-                    elif flag["timer"] == 60:
-                        self.moves = self._moves
-                        del self._moves
-                        self.player.symptoms[symptom]["status"] = False
-                        self.player.symptoms[symptom]["timer"] = 0
-                        print(flag["timer"])
-                    else:
-                        self.player.symptoms[symptom]["timer"] += 1
-                        print(flag["timer"])
+            if symptom == 'loss-of-balance' and flag["status"]:
+                if flag["timer"] == 0:
+                    self._moves = self.moves.copy()
+                    self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
+                                      sorted(self.moves.values(), key=lambda x: random())))
+                    self.player.symptoms[symptom]["timer"] += 1
+                elif flag["timer"] == 60:
+                    self.moves = self._moves
+                    del self._moves
+                    self.player.symptoms[symptom]["status"] = False
+                    self.player.symptoms[symptom]["timer"] = 0
+                else:
+                    self.player.symptoms[symptom]["timer"] += 1
+
+            elif symptom == 'fatigue' and flag["status"]:
+                if flag["timer"] == 0:
+                    self.player.speed = randint(0, 2)
+                    self.player.symptoms[symptom]["timer"] += 1
+                elif flag["timer"] == 60:
+                    self.player.speed = 4
+                    self.player.symptoms[symptom]["status"] = False
+                    self.player.symptoms[symptom]["timer"] = 0
+                else:
+                    self.player.symptoms[symptom]["timer"] += 1
                 
         if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
