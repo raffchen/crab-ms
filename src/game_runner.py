@@ -108,16 +108,7 @@ class GameView:
                 map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
     
     def shoot(self, mouse_click):
-        vector_direction = [0, 0]
-        if self.player.get_location()[0] - mouse_click[0] < 0:
-            vector_direction[0] = 1
-        elif self.player.get_location()[0] - mouse_click[0] > 0:
-            vector_direction[0] = -1
-        if self.player.get_location()[1] - mouse_click[1] < 0:
-            vector_direction[1] = 1
-        elif self.player.get_location()[1] - mouse_click[1] > 0:
-            vector_direction[1] = -1
-        vector_direction = tuple(vector_direction)
+        vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1], )
         if vector_direction != (0, 0):
             self.pebbles.append(Pebble(vector_direction, self.player.get_location()))
 
