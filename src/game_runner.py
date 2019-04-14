@@ -18,7 +18,7 @@ class GameView:
         self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
-
+        self.vignette = None
         self.pebbles = []
         self.stage = 1
         self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
@@ -77,6 +77,8 @@ class GameView:
             
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
+        if self.vignette is not None:
+            self.screen.blit(self.vignette, (0, 0))
         self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
         self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
         pygame.display.flip()
@@ -112,10 +114,10 @@ class GameView:
 
     def _handle_symptoms(self):
         if random() > 0.99:
-            random_symptom = choice(["loss-of-balance", "fatigue", "pain"])
+            random_symptom = choice(["loss-of-balance", "fatigue", "pain", "vision"])
             print(f"selected {random_symptom}")
             if not self.player.symptoms[random_symptom]["status"]:
-                if random() > .85:
+                if random() > .89:
                     self.player.symptoms[random_symptom]["status"] = True
                     print(f"{random_symptom} now active")
 
@@ -160,6 +162,18 @@ class GameView:
                 print(f"received {damage} damage")
                 print(f"{self.player.health} health remaining")
                 self.player.symptoms[symptom]["status"] = False
+
+            elif symptom == 'vision' and flag["status"]:
+                if flag["timer"] == 0:
+                    self.vignette = pygame.image.load(str(Path('./data/images/vignette.png')))
+                    self.player.symptoms[symptom]["timer"] += 1
+                elif flag["timer"] == 150:
+                    self.vignette = None
+                    pygame.display.flip()
+                    self.player.symptoms[symptom]["timer"] = 0
+                    self.player.symptoms[symptom]["status"] = False
+                else:
+                    self.player.symptoms[symptom]["timer"] += 1
                 
         proposed_move = self.player.rect.move(*self.moves[key])
         if (not proposed_move.right > self.background.rect.right and
