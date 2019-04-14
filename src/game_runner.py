@@ -24,10 +24,12 @@ class GameView:
         self.pebbles = [ ]
         self.jellyfish = [ ]
         self.stalkers = [ ]
+        self.vignette = None
+
         self.stage = 1
-        self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
-                       Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
-                       Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
+        # self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
+        #                Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
+        #                Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         '''self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -102,7 +104,9 @@ class GameView:
             
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
-        self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
+        if self.vignette is not None:
+            self.screen.blit(self.vignette, (0, 0))
+        # self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
         self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
         pygame.display.flip()
 
@@ -147,10 +151,10 @@ class GameView:
 
     def _handle_symptoms(self):
         if random() > 0.99:
-            random_symptom = choice(["loss-of-balance", "fatigue", "pain"])
+            random_symptom = choice(["loss-of-balance", "fatigue", "pain", "vision"])
             print(f"selected {random_symptom}")
             if not self.player.symptoms[random_symptom]["status"]:
-                if random() > .85:
+                if random() > .89:
                     self.player.symptoms[random_symptom]["status"] = True
                     print(f"{random_symptom} now active")
 
@@ -195,6 +199,18 @@ class GameView:
                 print(f"received {damage} damage")
                 print(f"{self.player.health} health remaining")
                 self.player.symptoms[symptom]["status"] = False
+
+            elif symptom == 'vision' and flag["status"]:
+                if flag["timer"] == 0:
+                    self.vignette = pygame.image.load(str(Path('./data/images/vignette.png')))
+                    self.player.symptoms[symptom]["timer"] += 1
+                elif flag["timer"] == 150:
+                    self.vignette = None
+                    pygame.display.flip()
+                    self.player.symptoms[symptom]["timer"] = 0
+                    self.player.symptoms[symptom]["status"] = False
+                else:
+                    self.player.symptoms[symptom]["timer"] += 1
                 
         proposed_move = self.player.rect.move(*self.moves[key])
         if (not proposed_move.right > self.background.rect.right and
