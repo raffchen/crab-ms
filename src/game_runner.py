@@ -6,6 +6,7 @@ from crab import Crab
 from player import Player
 from seagull import Seagull
 from pebble import Pebble
+from jellyfish import Jellyfish
 
 IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
@@ -18,7 +19,8 @@ class GameView:
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
 
-        self.pebbles = []
+        self.pebbles = [ ]
+        self.jellyfish = [ ]
         self.stage = 1
         self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
                        Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
@@ -70,6 +72,11 @@ class GameView:
         for pebble in self.pebbles:
             self.screen.blit(Pebble.img, pebble.location)
             pebble.update()
+            
+        for jelly in self.jellyfish:
+            self.screen.blit(jelly.image, jelly._location)
+            jelly.update()
+            
         if self.player.health > 0:
             self.player.update()
             self.screen.blit(self.player.img, self.player.rect)
@@ -96,6 +103,10 @@ class GameView:
                 self._move("down")
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self._move("right")
+            if keys[pygame.K_SPACE]:
+                print('space')
+                self.jellyfish.append(Jellyfish((35, 35), (int(IMAGE_WIDTH*ROW_LENGTH*random()), int(IMAGE_HEIGHT*ROW_LENGTH*random()))))
+                print(self.jellyfish)
         else:
             if keys[pygame.K_r]:
                 self.__init__()
@@ -103,6 +114,12 @@ class GameView:
                 pygame.mixer.music.play() 
                 map_generator.default_x_coord = map_generator.DEFAULT_STARTING_X_COORD
                 map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
+                
+        self.spawn_jellyfish()
+        
+    def spawn_jellyfish(self):
+        if random() <= 0.03:
+            self.jellyfish.append(Jellyfish((35, 35), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH)))
     
     def shoot(self, mouse_click):
         vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1], )
@@ -119,7 +136,7 @@ class GameView:
                     print(f"{random_symptom} now active")
 
     def _move(self, key):
-        self._handle_symptoms()
+       # self._handle_symptoms()
         for symptom, flag in self.player.symptoms.items():
             if symptom == 'loss-of-balance' and flag["status"]:
                 if flag["timer"] == 0:
