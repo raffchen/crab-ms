@@ -5,12 +5,11 @@ from player import Player
 class LittleFish(Player):
     img = pygame.transform.scale(pygame.image.load(str(Path("./data/images/littlefish.png"))), (35, 35))
     def __init__(self, crab, location: tuple = (0, 0)):
-        self.image = Jellyfish.img
+        self.image = LittleFish.img
         self.health = 10
         self.location = location
         self.crab = crab
         self.speed = 5
-        self.lst = lst
 
     def _contains(self):
         if(((crab.get_location()[0]-self.get_location()[0])**2)+\
