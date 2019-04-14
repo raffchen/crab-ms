@@ -177,9 +177,6 @@ class GameView:
             if INVERSE_SPEED > 2: INVERSE_SPEED -= 1
             SPAWN_RATE += 0.001
 
-        if pygame.time.get_ticks()%INVERSE_SPEED == 0:
-            self.player_shoot(pygame.mouse.get_pos())
-
         mouse_buttons = pygame.mouse.get_pressed()
         keys = pygame.key.get_pressed()
         if self.player.health > 0:
