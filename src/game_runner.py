@@ -155,7 +155,8 @@ class GameView:
     
     def spawn_littlefish(self):
         if random() <= 0.02:
-            self.littlefish.append(LittleFish(self.player))
+            self.littlefish.append(LittleFish(self.player,(int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
+            
             
     def spawn_stalker(self):
         if random() <= 0.03:
