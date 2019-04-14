@@ -120,7 +120,7 @@ class GameView:
         for fish in self.littlefish.copy():
             self.screen.blit(fish.image, fish._location)
             var = fish.update()
-            if(var):
+            if var:
                 l_lst.append(var)
 
         self.littlefish = l_lst
@@ -164,7 +164,7 @@ class GameView:
         if self.vignette is not None:
             self.screen.blit(self.vignette, (0, 0))
         self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
-        if(self.player.health>0):
+        if self.player.health > 0:
             self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
         else:
             self.screen.blit(self.h_bars[0].img, self.h_bars[0].rect)
@@ -181,7 +181,7 @@ class GameView:
             if INVERSE_SPEED > 2: INVERSE_SPEED -= 1
             SPAWN_RATE += 0.001
 
-        if pygame.time.get_ticks()%INVERSE_SPEED == 0:
+        if pygame.time.get_ticks()%INVERSE_SPEED in (0, 1):
             self.player_shoot(pygame.mouse.get_pos())
 
         mouse_buttons = pygame.mouse.get_pressed()
@@ -216,7 +216,7 @@ class GameView:
             self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def spawn_littlefish(self):
-        if random() <= SPAWN_RATE:
+        if random() <= SPAWN_RATE * 0.1:
             self.littlefish.append(LittleFish(self.player,(int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
             
     def spawn_stalker(self):
@@ -242,13 +242,13 @@ class GameView:
             random_symptom = choice(["loss-of-balance", "fatigue", "pain", "vision"])
             print(f"selected {random_symptom}")
             if not self.player.symptoms[random_symptom]["status"]:
-                if random() > .87:
+                if random() > .86:
                     self.player.symptoms[random_symptom]["status"] = True
                     print(f"{random_symptom} now active")
 
     def _move(self, key):
         self._handle_symptoms()
-        symptom_cooldown = randint(100, 200)
+        symptom_cooldown = randint(200, 300)
         for symptom, flag in self.player.symptoms.items():
             if symptom == 'loss-of-balance' and flag["status"]:
                 if flag["timer"] == 0:
@@ -264,9 +264,9 @@ class GameView:
 
             elif symptom == 'fatigue' and flag["status"]:
                 if flag["timer"] == 0:
-                    self.player.speed = choices([0, 1, 2, 3], [5, 10, 10, 25])[0]/4
+                    self.player.speed = choices([1, 2, 3], [5, 15, 30])[0]/4
                     self.moves = {k: tuple(map(lambda x: int(x * self.player.speed), v)) for k, v in self.moves.items()}
-                    self.player.symptoms[symptom]["timer"] += 1
+                    self.player.symptoms[symptom]["timer"] += 2
                 elif flag["timer"] > symptom_cooldown:
                     self.player.speed = 4
                     self.player.symptoms[symptom]["status"] = False
