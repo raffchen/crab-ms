@@ -1,7 +1,7 @@
 # crab-ms
 A bullet hell game with a crab suffering from effects of multiple sclerosis as the protagonist.
 
-## What is crab-ms?
+# What is crab-ms?
 As the subtitle says, crab-ms is a bullet hell shooter game written completely in Python in which you play as a crab avoiding a swarm of squid that shoot ink at you, stalker fish, and killer jellyfish! Thankfully, you're able to throw pebbles at an extremely fast pace, scaring off the predators that you hit. Unfortunately, you're a crab that suffers from some common symptoms of multiple sclerosis (hence the "ms" in the name) like loss of balance, fatigue, and loss of vision. 
 
 ### What do these ailments mean to the player?
