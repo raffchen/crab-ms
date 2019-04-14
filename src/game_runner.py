@@ -46,7 +46,7 @@ class GameView:
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
-        pygame.mixer.music.play() 
+        pygame.mixer.music.play(-1) 
 
     def run(self):
         """initializes, executes, and quits the pygame"""
