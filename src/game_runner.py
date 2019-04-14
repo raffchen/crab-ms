@@ -30,8 +30,10 @@ class GameView:
         self.start = time.time()
 
         self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
-        self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
-        self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (280, 300))
+        self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH,
+                                                                        IMAGE_HEIGHT*ROW_LENGTH))
+        self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")),
+                           (35, 35), (280, 300))
 
         self.pebbles = []
         self.jellyfish = []
@@ -59,6 +61,12 @@ class GameView:
                       "down": (0, self.player.speed), "right": (self.player.speed, 0)}
         self._moves = self.moves.copy()
 
+        pygame.init()
+        pygame.display.init()
+        pygame.font.init()
+
+        self.font = pygame.font.Font('freesansbold.ttf', 30)
+
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
@@ -66,9 +74,6 @@ class GameView:
 
     def run(self):
         """initializes, executes, and quits the pygame"""
-        pygame.init()
-        pygame.display.init()
-
         clock = pygame.time.Clock()
 
         while self.running:
@@ -87,7 +92,6 @@ class GameView:
         #    self.screen.blit(gull.img, gull.rect)
         if self.player.health < 0:
             return
-        
         
         for pebble in self.pebbles:
             self.screen.blit(Pebble.img, pebble.location)
@@ -133,14 +137,16 @@ class GameView:
             
         for stalker in self.stalkers:
             self.screen.blit(stalker.image, stalker._location)
-            stalker.update((self.player.get_location()[0]-stalker._location[0], self.player.get_location()[1]-stalker._location[1]))
+            stalker.update((self.player.get_location()[0]-stalker._location[0],
+                            self.player.get_location()[1]-stalker._location[1]))
             if stalker.rect.colliderect(self.player.rect):
                 self.player.health -= 10
                 self.stalkers.remove(stalker)
                 
         for squid in self.squids:
             self.screen.blit(squid.image, squid._location)
-            squid.update((self.player.get_location()[0]-squid._location[0], self.player.get_location()[1]-squid._location[1]))
+            squid.update((self.player.get_location()[0]-squid._location[0],
+                          self.player.get_location()[1]-squid._location[1]))
             if pygame.time.get_ticks()%50 == 0:
                 self.squid_shoot(squid)
             if squid.rect.colliderect(self.player.rect):
@@ -157,13 +163,16 @@ class GameView:
         if self.player.health > 0:
             self.player.update()
             self.screen.blit(self.player.img, self.player.rect)
-            
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
+
         if self.vignette is not None:
             self.screen.blit(self.vignette, (0, 0))
+
         if self.player.health > 0:
             self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
+            self.screen.blit(self.font.render(f"Score: {int(time.time() - self.start)}", True, (255, 0, 0)),
+                             (425, 35))
         else:
             self.screen.blit(self.h_bars[0].img, self.h_bars[0].rect)
         pygame.display.flip()
@@ -210,12 +219,15 @@ class GameView:
         self.spawn_littlefish()
         
     def spawn_jellyfish(self):
-        if random() <= SPAWN_RATE:
-            self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
+        spawn_location = (int(random() * IMAGE_WIDTH * ROW_LENGTH), int(random() * IMAGE_HEIGHT * ROW_LENGTH))
+        if random() <= SPAWN_RATE * 1.1 and math.sqrt(((self.player.get_location()[0] - spawn_location[0]) ** 2) +
+                                                      (self.player.get_location()[1] - spawn_location[1]) ** 2) >= 30:
+            self.jellyfish.append(Jellyfish((40, 40), spawn_location))
     
     def spawn_littlefish(self):
         if random() <= SPAWN_RATE * 0.1:
-            self.littlefish.append(LittleFish(self.player, (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
+            self.littlefish.append(LittleFish(self.player, (int(random()*IMAGE_WIDTH*ROW_LENGTH),
+                                                            int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
             
     def spawn_stalker(self):
         spawn_location = (int(random() * IMAGE_WIDTH * ROW_LENGTH), int(random() * IMAGE_HEIGHT * ROW_LENGTH))
@@ -230,7 +242,7 @@ class GameView:
             self.squids.append(Squid((40, 40), spawn_location))
     
     def player_shoot(self, mouse_click):
-        vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1], )
+        vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1])
         if vector_direction != (0, 0):
             self.pebbles.append(Pebble(vector_direction, self.player.get_location()))
             
