@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from random import random, choices
+from random import random, choice, choices
 import map_generator
 from crab import Crab
 from player import Player
@@ -17,10 +17,7 @@ class GameView:
         self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
-        # TEST
-        self.player.symptoms['loss-of-balance']['status'] = False
-        self.player.symptoms['fatigue']['status'] = False
-        # END TEST
+
         self.pebbles = []
         self.stage = 1
         self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
@@ -112,7 +109,17 @@ class GameView:
         if vector_direction != (0, 0):
             self.pebbles.append(Pebble(vector_direction, self.player.get_location()))
 
+    def _handle_symptoms(self):
+        if random() > 0.99:
+            random_symptom = choice(["loss-of-balance", "fatigue"])
+            print(f"selected {random_symptom}")
+            if not self.player.symptoms[random_symptom]["status"]:
+                if random() > .85:
+                    self.player.symptoms[random_symptom]["status"] = True
+                    print(f"{random_symptom} now active")
+
     def _move(self, key):
+        self._handle_symptoms()
         for symptom, flag in self.player.symptoms.items():
             if symptom == 'loss-of-balance' and flag["status"]:
                 if flag["timer"] == 0:
