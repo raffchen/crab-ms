@@ -27,7 +27,7 @@ class GameView:
         self.running = True
         self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
-        self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
+        self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (280, 300))
 
         self.pebbles = []
         self.jellyfish = []
@@ -41,7 +41,7 @@ class GameView:
         # self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
         #                Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
         #                Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
-        self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
+        self.end_screen = Player(str(Path("./data/images/endgame.png")), (570, 550))
         # self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
         #               Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
         #               Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
