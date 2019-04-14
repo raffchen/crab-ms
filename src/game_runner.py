@@ -92,9 +92,8 @@ class GameView:
                     self.pebbles.remove(pebble)
             
         l_lst = []
-        
         for fish in self.littlefish.copy():
-            self.screen.blit(fish.image, fish.location)
+            self.screen.blit(fish.image, fish._location)
             var = fish.update()
             if(var):
                 l_lst.append(var)
