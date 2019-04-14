@@ -24,6 +24,7 @@ class GameView:
         self.pebbles = [ ]
         self.jellyfish = [ ]
         self.stalkers = [ ]
+        self.littlefish = []
         self.vignette = None
 
         self.stage = 1
@@ -83,7 +84,18 @@ class GameView:
                     if jelly.health == 0:
                         self.jellyfish.remove(jelly)
                     self.pebbles.remove(pebble)
-            for stalker in self.stalkers:
+            
+            l_lst = []
+        
+        for fish in self.littlefish.copy():
+            self.screen.blit(fish.image, fish.location)
+            var = fish.update()
+            if(var):
+                l_lst.append(var)
+
+        self.littlefish = l_lst
+        
+        for stalker in self.stalkers:
                 if pebble.rect.colliderect(stalker.rect):
                     stalker.health -= 1
                     if stalker.health == 0:
@@ -141,6 +153,10 @@ class GameView:
         if random() <= 0.03:
             self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
+    def spawn_littlefish(self):
+        if random() <= 0.02:
+            self.littlefish.append(LittleFish(self.player))
+            
     def spawn_stalker(self):
         if random() <= 0.03:
             self.stalkers.append(Stalker((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
