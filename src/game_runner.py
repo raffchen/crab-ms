@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from random import random, choices
+from random import random, choice, choices
 import map_generator
 from crab import Crab
 from player import Player
@@ -17,11 +17,12 @@ class GameView:
         self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
-        # TEST
-        self.player.symptoms['loss-of-balance']['status'] = False
-        self.player.symptoms['fatigue']['status'] = False
-        # END TEST
+
         self.pebbles = []
+        self.stage = 1
+        self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
+                       Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
+                       Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         '''self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -42,7 +43,7 @@ class GameView:
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
-        pygame.mixer.music.play()
+        pygame.mixer.music.play() 
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -75,6 +76,7 @@ class GameView:
             
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
+        self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
         self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
         pygame.display.flip()
 
@@ -97,6 +99,8 @@ class GameView:
         else:
             if keys[pygame.K_r]:
                 self.__init__()
+                pygame.mixer.music.load("./data/music/Crab.mp3")
+                pygame.mixer.music.play() 
                 map_generator.default_x_coord = map_generator.DEFAULT_STARTING_X_COORD
                 map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
     
@@ -114,7 +118,17 @@ class GameView:
         if vector_direction != (0, 0):
             self.pebbles.append(Pebble(vector_direction, self.player.get_location()))
 
+    def _handle_symptoms(self):
+        if random() > 0.99:
+            random_symptom = choice(["loss-of-balance", "fatigue"])
+            print(f"selected {random_symptom}")
+            if not self.player.symptoms[random_symptom]["status"]:
+                if random() > .85:
+                    self.player.symptoms[random_symptom]["status"] = True
+                    print(f"{random_symptom} now active")
+
     def _move(self, key):
+        self._handle_symptoms()
         for symptom, flag in self.player.symptoms.items():
             if symptom == 'loss-of-balance' and flag["status"]:
                 if flag["timer"] == 0:
