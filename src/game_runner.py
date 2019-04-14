@@ -86,7 +86,7 @@ class GameView:
                         self.jellyfish.remove(jelly)
                     self.pebbles.remove(pebble)
             
-            l_lst = []
+        l_lst = []
         
         for fish in self.littlefish.copy():
             self.screen.blit(fish.image, fish.location)
@@ -149,6 +149,7 @@ class GameView:
                 
         self.spawn_jellyfish()
         self.spawn_stalker()
+        self.spawn_littlefish()
         
     def spawn_jellyfish(self):
         if random() <= 0.03:
