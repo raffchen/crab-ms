@@ -5,7 +5,7 @@ from player import Player
 class LittleFish(Player):
     img = pygame.transform.scale(pygame.image.load(str(Path("./data/images/littlefish.png"))), (35, 35))
     def __init__(self, crab, location: tuple = (0, 0)):
-        self.image = Jellyfish.img
+        self.image = LittleFish.img
         self.health = 10
         self.location = location
         self.crab = crab
