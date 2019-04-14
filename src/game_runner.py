@@ -71,7 +71,7 @@ class GameView:
 
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
-        pygame.mixer.music.load("./data/music/Intro.mp3")
+        pygame.mixer.music.load("./data/music/Passport.mp3")
         pygame.mixer.music.play(-1) 
 
     def run(self):
@@ -220,7 +220,7 @@ class GameView:
         else:
             if keys[pygame.K_r]:
                 self.__init__()
-                pygame.mixer.music.load("./data/music/Crab.mp3")
+                pygame.mixer.music.load("./data/music/Passport.mp3")
                 pygame.mixer.music.play() 
                 map_generator.default_x_coord = map_generator.DEFAULT_STARTING_X_COORD
                 map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
