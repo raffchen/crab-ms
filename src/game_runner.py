@@ -85,6 +85,9 @@ class GameView:
         map_generator.loadLevel(self.screen, 'level1.txt')
         # for gull in self.gulls:
         #    self.screen.blit(gull.img, gull.rect)
+        if self.player.health < 0:
+            return
+        
         
         for pebble in self.pebbles:
             self.screen.blit(Pebble.img, pebble.location)
