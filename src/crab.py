@@ -20,8 +20,7 @@ class Crab(Player):
             "loss-of-balance": {"status": False, "timer": 0},
             "fatigue": {"status": False, "timer": 0},
             "pain": {"status": False, "timer": 0},
-            "vision": {"status": False, "timer": 0},
-            "weakness": {"status": False, "timer": 0}
+            "vision": {"status": False, "timer": 0}
         }
         self.speed = 6
 

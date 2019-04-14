@@ -1,6 +1,6 @@
 import pygame
 from pathlib import Path
-from random import random, choice, choices
+from random import random, choice, choices, randint
 import map_generator
 from crab import Crab
 from player import Player
@@ -161,6 +161,7 @@ class GameView:
     def spawn_stalker(self):
         if random() <= 0.03:
             self.stalkers.append(Stalker((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
+
     def shoot(self, mouse_click):
         vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1], )
         if vector_direction != (0, 0):
@@ -176,7 +177,8 @@ class GameView:
                     print(f"{random_symptom} now active")
 
     def _move(self, key):
-       # self._handle_symptoms()
+        # self._handle_symptoms()
+        symptom_cooldown = randint(100, 200)
         for symptom, flag in self.player.symptoms.items():
             if symptom == 'loss-of-balance' and flag["status"]:
                 if flag["timer"] == 0:
@@ -184,7 +186,7 @@ class GameView:
                     self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
                                       sorted(self.moves.values(), key=lambda x: random())))
                     self.player.symptoms[symptom]["timer"] += 1
-                elif flag["timer"] == 150:
+                elif flag["timer"] > symptom_cooldown:
                     self.moves = self._moves
                     del self._moves
                     self.player.symptoms[symptom]["status"] = False
@@ -197,7 +199,7 @@ class GameView:
                     self.player.speed = choices([0, 1, 2, 3], [5, 10, 10, 25])[0]/4
                     self.moves = {k: tuple(map(lambda x: int(x * self.player.speed), v)) for k, v in self.moves.items()}
                     self.player.symptoms[symptom]["timer"] += 1
-                elif flag["timer"] == 150:
+                elif flag["timer"] > symptom_cooldown:
                     self.player.speed = 4
                     self.player.symptoms[symptom]["status"] = False
                     self.player.symptoms[symptom]["timer"] = 0
@@ -221,7 +223,7 @@ class GameView:
                 if flag["timer"] == 0:
                     self.vignette = pygame.image.load(str(Path('./data/images/vignette.png')))
                     self.player.symptoms[symptom]["timer"] += 1
-                elif flag["timer"] == 150:
+                elif flag["timer"] > symptom_cooldown:
                     self.vignette = None
                     pygame.display.flip()
                     self.player.symptoms[symptom]["timer"] = 0
