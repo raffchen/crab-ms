@@ -1,4 +1,4 @@
 # crab-ms
-game about a crab with multiple sclerosis
+A bullet hell game with a crab suffering from effects of multiple sclerosis as the protagonist.
 
 Music from: https://www.purple-planet.com
