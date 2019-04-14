@@ -38,10 +38,11 @@ class GameView:
         self.vignette = None
 
         self.stage = 1
-        # self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
-        #                Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
-        #                Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
-        self.end_screen = Player(str(Path("./data/images/endgame.png")), (570, 550))
+        self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (390,-10)),
+                    Player(str(Path("./data/images/month2.png")), (216, 134), (390,-10)),
+                    Player(str(Path("./data/images/month3.png")), (216, 134), (390,-10))]
+        self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450), (-70, 0))
+        self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450), (-70, 0))
         # self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
         #               Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
         #               Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
@@ -163,7 +164,10 @@ class GameView:
         if self.vignette is not None:
             self.screen.blit(self.vignette, (0, 0))
         # self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
-        self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
+        if(self.player.health>0):
+            self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
+        else:
+            self.screen.blit(self.h_bars[0].img, self.h_bars[0].rect)
         pygame.display.flip()
 
     def _handle_events(self):
