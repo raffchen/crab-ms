@@ -28,6 +28,7 @@ class GameView:
     def __init__(self):
         self.running = True
         self.start = time.time()
+        self.score = 0
 
         self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH,
@@ -65,7 +66,8 @@ class GameView:
         pygame.display.init()
         pygame.font.init()
 
-        self.font = pygame.font.Font('freesansbold.ttf', 30)
+        self.score_font = pygame.font.Font('freesansbold.ttf', 30)
+        self.symptom_font = pygame.font.Font('freesansbold.ttf', 15)
 
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
@@ -80,7 +82,7 @@ class GameView:
             clock.tick(60)
             self._handle_events()
             self._display_board()
-            print(time.time() - self.start)
+            self.score += time.time() - self.start - self.score
         pygame.quit()  
 
     def _display_board(self):
@@ -171,10 +173,21 @@ class GameView:
 
         if self.player.health > 0:
             self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
-            self.screen.blit(self.font.render(f"Score: {int(time.time() - self.start)}", True, (255, 0, 0)),
+            self.screen.blit(self.score_font.render(f"Score: {int(self.score)}", True, (255, 0, 0)),
                              (425, 35))
+            if self.player.symptoms["loss-of-balance"]["status"]:
+                self.screen.blit(self.symptom_font.render("{:20}".format("randomized controls"), True, (255, 0, 0)),
+                                 (30, 565))
+            if self.player.symptoms["fatigue"]["status"]:
+                self.screen.blit(self.symptom_font.render("{:20}".format("fatigued"), True, (255, 0, 0)),
+                                 (30, 535))
+            if self.player.symptoms["vision"]["status"]:
+                self.screen.blit(self.symptom_font.render("{:20}".format("loss of vision"), True, (255, 0, 0)),
+                                 (30, 505))
         else:
             self.screen.blit(self.h_bars[0].img, self.h_bars[0].rect)
+            self.screen.blit(self.score_font.render(f"Final Score: {int(self.score)}", True, (255, 0, 0)),
+                             (200, 400))
         pygame.display.flip()
 
     def _handle_events(self):
