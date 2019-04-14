@@ -16,7 +16,7 @@ IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
 ROW_LENGTH = map_generator.ABSOLUTE_BORDER_SIZE
 
-SPAWN_RATE = 0.02
+SPAWN_RATE = 0.01
 INVERSE_SPEED = 10
 
 LAST_MOUSE_POSITION = (0,0)
@@ -173,6 +173,9 @@ class GameView:
         if pygame.time.get_ticks()%1000 == 0:
             if INVERSE_SPEED > 2: INVERSE_SPEED -= 1
             SPAWN_RATE += 0.001
+
+        if pygame.time.get_ticks()%INVERSE_SPEED == 0:
+            self.player_shoot(pygame.mouse.get_pos())
 
         mouse_buttons = pygame.mouse.get_pressed()
         keys = pygame.key.get_pressed()
