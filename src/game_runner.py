@@ -48,6 +48,8 @@ class GameView:
 
         self.moves = {"up": (0, -self.player.speed), "left": (-self.player.speed, 0),
                       "down": (0, self.player.speed), "right": (self.player.speed, 0)}
+        self._moves = self.moves.copy()
+
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
@@ -83,13 +85,15 @@ class GameView:
                     jelly.health -= 1
                     if jelly.health == 0:
                         self.jellyfish.remove(jelly)
-                    self.pebbles.remove(pebble)
+                    if pebble in self.pebbles:
+                        self.pebbles.remove(pebble)
             for stalker in self.stalkers:
                 if pebble.rect.colliderect(stalker.rect):
                     stalker.health -= 1
                     if stalker.health == 0:
                         self.stalkers.remove(stalker)
-                    self.pebbles.remove(pebble)
+                    if pebble in self.pebbles:
+                        self.pebbles.remove(pebble)
             
         l_lst = []
         
@@ -172,7 +176,7 @@ class GameView:
             random_symptom = choice(["loss-of-balance", "fatigue", "pain", "vision"])
             print(f"selected {random_symptom}")
             if not self.player.symptoms[random_symptom]["status"]:
-                if random() > .89:
+                if random() > .87:
                     self.player.symptoms[random_symptom]["status"] = True
                     print(f"{random_symptom} now active")
 
@@ -182,13 +186,11 @@ class GameView:
         for symptom, flag in self.player.symptoms.items():
             if symptom == 'loss-of-balance' and flag["status"]:
                 if flag["timer"] == 0:
-                    self._moves = self.moves.copy()
                     self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
                                       sorted(self.moves.values(), key=lambda x: random())))
                     self.player.symptoms[symptom]["timer"] += 1
                 elif flag["timer"] > symptom_cooldown:
                     self.moves = self._moves
-                    del self._moves
                     self.player.symptoms[symptom]["status"] = False
                     self.player.symptoms[symptom]["timer"] = 0
                 else:
@@ -207,8 +209,7 @@ class GameView:
                         self.moves = {k: tuple(map(lambda x: int(x * self.player.speed/x), v))
                                       for k, v in self.moves.items()}
                     except ZeroDivisionError:
-                        self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
-                                      "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
+                        self.moves = self._moves.copy()
                 else:
                     self.player.symptoms[symptom]["timer"] += 1
 
