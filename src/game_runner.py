@@ -1,7 +1,8 @@
 import pygame
+import map_generator
+import time
 from pathlib import Path
 from random import random, choice, choices, randint
-import map_generator
 from crab import Crab
 from player import Player
 from seagull import Seagull
@@ -25,6 +26,8 @@ LAST_MOUSE_POSITION = (0, 0)
 class GameView:
     def __init__(self):
         self.running = True
+        self.start = time.time()
+
         self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (280, 300))
@@ -68,10 +71,10 @@ class GameView:
         clock = pygame.time.Clock()
 
         while self.running:
-            for _ in range(4):
-                clock.tick(60)
-                self._handle_events()
-                self._display_board()
+            clock.tick(60)
+            self._handle_events()
+            self._display_board()
+            print(time.time() - self.start)
         pygame.quit()  
 
     def _display_board(self):
@@ -233,7 +236,7 @@ class GameView:
 
     def _handle_symptoms(self):
         if random() > 0.99:
-            random_symptom = choice(["loss-of-balance", "fatigue", "pain", "vision"])
+            random_symptom = choice(["loss-of-balance", "fatigue", "vision"])
             print(f"selected {random_symptom}")
             if not self.player.symptoms[random_symptom]["status"]:
                 if random() > .86:
@@ -272,13 +275,6 @@ class GameView:
                         self.moves = self._moves.copy()
                 else:
                     self.player.symptoms[symptom]["timer"] += 1
-
-            elif symptom == 'pain' and flag["status"]:
-                damage = choices([10, 5, 2, 1], [2, 8, 20, 20])[0]
-                self.player.health -= damage
-                print(f"received {damage} damage")
-                print(f"{self.player.health} health remaining")
-                self.player.symptoms[symptom]["status"] = False
 
             elif symptom == 'vision' and flag["status"]:
                 if flag["timer"] == 0:

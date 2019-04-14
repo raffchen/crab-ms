@@ -18,7 +18,7 @@ class LittleFish(Player):
 
     def _contains(self):
         if(sqrt(((self.crab.get_location()[0]-self.get_location()[0])**2)+\
-           ((self.crab.get_location()[1]-self.get_location()[1])**2 )) < 17):
+           ((self.crab.get_location()[1]-self.get_location()[1])**2 )) <= 25):
             print(sqrt(((self.crab.get_location()[0]-self.get_location()[0])**2)+\
            ((self.crab.get_location()[1]-self.get_location()[1])**2 )))
             return True
