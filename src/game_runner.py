@@ -7,6 +7,7 @@ from player import Player
 from seagull import Seagull
 from pebble import Pebble
 from jellyfish import Jellyfish
+from stalker_fish import Stalker
 
 IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
@@ -22,6 +23,7 @@ class GameView:
 
         self.pebbles = [ ]
         self.jellyfish = [ ]
+        self.stalkers = [ ]
         self.stage = 1
         self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
                        Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
@@ -79,10 +81,20 @@ class GameView:
                     if jelly.health == 0:
                         self.jellyfish.remove(jelly)
                     self.pebbles.remove(pebble)
+            for stalker in self.stalkers:
+                if pebble.rect.colliderect(stalker.rect):
+                    stalker.health -= 1
+                    if stalker.health == 0:
+                        self.stalkers.remove(stalker)
+                    self.pebbles.remove(pebble)
             
         for jelly in self.jellyfish:
             self.screen.blit(jelly.image, jelly._location)
             jelly.update()
+            
+        for stalker in self.stalkers:
+            self.screen.blit(stalker.image, stalker._location)
+            stalker.update((self.player.get_location()[0]-stalker._location[0], self.player.get_location()[1]-stalker._location[1]))
             
         if self.player.health > 0:
             self.player.update()
@@ -119,11 +131,15 @@ class GameView:
                 map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
                 
         self.spawn_jellyfish()
+        self.spawn_stalker()
         
     def spawn_jellyfish(self):
         if random() <= 0.03:
             self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
+    def spawn_stalker(self):
+        if random() <= 0.03:
+            self.stalkers.append(Stalker((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     def shoot(self, mouse_click):
         vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1], )
         if vector_direction != (0, 0):
