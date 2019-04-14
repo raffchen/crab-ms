@@ -16,7 +16,7 @@ IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
 ROW_LENGTH = map_generator.ABSOLUTE_BORDER_SIZE
 
-SPAWN_RATE = 0.01
+SPAWN_RATE = 0.015
 INVERSE_SPEED = 10
 
 LAST_MOUSE_POSITION = (0, 0)
@@ -175,7 +175,7 @@ class GameView:
             if INVERSE_SPEED > 2: INVERSE_SPEED -= 1
             SPAWN_RATE += 0.001
 
-        if pygame.time.get_ticks()%INVERSE_SPEED in (0, 1):
+        if pygame.time.get_ticks()%(INVERSE_SPEED+5) in (0, 1, 2, 3, 4, 5):
             self.player_shoot(pygame.mouse.get_pos())
 
         mouse_buttons = pygame.mouse.get_pressed()
@@ -218,7 +218,7 @@ class GameView:
             self.stalkers.append(Stalker((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def spawn_squid(self):
-        if random() <= SPAWN_RATE:
+        if random() <= SPAWN_RATE * 1.1:
             self.squids.append(Squid((40,40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def player_shoot(self, mouse_click):
