@@ -3,7 +3,7 @@ from pathlib import Path
 from player import Player
 
 class LittleFish(Player):
-    img = pygame.transform.scale(pygame.image.load(str(Path("./data/images/littlefish.png"))), (35, 35))
+    img = pygame.transform.scale(pygame.image.load(str(Path("./data/images/littlefish.png"))), (20, 26))
 
     def __init__(self, crab, location: tuple = (0, 0)):
         self.image = LittleFish.img
@@ -27,7 +27,7 @@ class LittleFish(Player):
             return
         elif(pygame.time.get_ticks() % 2 == 0):
             if(10<self.location[0]<690):
-                self.location = (self.location[0]+speed,self.location[1])
+                self.location = (self.location[0]+self.speed,self.location[1])
         return self
 
     def get_location(self):
