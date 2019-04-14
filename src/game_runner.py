@@ -16,6 +16,11 @@ IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
 ROW_LENGTH = map_generator.ABSOLUTE_BORDER_SIZE
 
+SPAWN_RATE = 0.03
+INVERSE_SPEED = 10
+
+LAST_MOUSE_POSITION = (0,0)
+
 
 class GameView:
     def __init__(self):
@@ -151,8 +156,15 @@ class GameView:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
-            elif event.type == pygame.MOUSEBUTTONUP:
-                self.player_shoot(pygame.mouse.get_pos())
+        
+        global INVERSE_SPEED, SPAWN_RATE
+        if pygame.time.get_ticks()%INVERSE_SPEED == 0:
+            self.player_shoot(pygame.mouse.get_pos())
+            
+        if pygame.time.get_ticks()%1000 == 0:
+            if INVERSE_SPEED > 2: INVERSE_SPEED -= 1
+            SPAWN_RATE += 0.001
+            
         keys = pygame.key.get_pressed()
         if self.player.health > 0:
             if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -177,20 +189,20 @@ class GameView:
         self.spawn_littlefish()
         
     def spawn_jellyfish(self):
-        if random() <= 0.02:
+        if random() <= SPAWN_RATE:
             self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def spawn_littlefish(self):
-        if random() <= 0.02:
+        if random() <= SPAWN_RATE:
             self.littlefish.append(LittleFish(self.player,(int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
             
             
     def spawn_stalker(self):
-        if random() <= 0.02:
+        if random() <= SPAWN_RATE:
             self.stalkers.append(Stalker((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def spawn_squid(self):
-        if random() <= 0.02:
+        if random() <= SPAWN_RATE:
             self.squids.append(Squid((40,40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def player_shoot(self, mouse_click):
