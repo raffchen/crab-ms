@@ -8,9 +8,11 @@ class LittleFish(Player):
     def __init__(self, crab, location: tuple = (0, 0)):
         self.image = LittleFish.img
         self.health = 10
-        self.location = location
+        self._location = location
         self.crab = crab
         self.speed = 5
+        self.rect = pygame.Rect(self._location[0], self._location[1], 20, 26)
+
 
     def _contains(self):
         if(((self.crab.get_location()[0]-self.get_location()[0])**2)+\
@@ -25,12 +27,15 @@ class LittleFish(Player):
             else:
                 self.crab.health = 80
             return
-        elif(pygame.time.get_ticks() % 2 == 0):
-            if(10<self.location[0]<690):
-                self.location = (self.location[0]+self.speed,self.location[1])
+        else:
+            if((10>=self._location[0] and self.speed<0) or (self._location[0]>=690 and self.speed>0)):
+                self.speed *=-1
+                
+            self._location = (self._location[0]+self.speed,self._location[1])
+        self.rect = pygame.Rect(self._location[0], self._location[1], 20, 26)
         return self
 
     def get_location(self):
-        return self.location
+        return self._location
                 
         
