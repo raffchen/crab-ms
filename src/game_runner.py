@@ -184,8 +184,7 @@ class GameView:
         
         global INVERSE_SPEED, SPAWN_RATE
             
-        if pygame.time.get_ticks()%1000 == 0:
-            if INVERSE_SPEED > 2: INVERSE_SPEED -= 1
+        if pygame.time.get_ticks()%1500 == 0:
             SPAWN_RATE += 0.001
 
         if pygame.time.get_ticks()%(INVERSE_SPEED+5) in (0, 1, 2, 3):
@@ -232,13 +231,13 @@ class GameView:
     def spawn_stalker(self):
         spawn_location = (int(random() * IMAGE_WIDTH * ROW_LENGTH), int(random() * IMAGE_HEIGHT * ROW_LENGTH))
         if random() <= SPAWN_RATE * 1.1 and math.sqrt(((self.player.get_location()[0]-spawn_location[0])**2) +
-                                                      (self.player.get_location()[1]-spawn_location[1])**2) >= 30:
+                                                      (self.player.get_location()[1]-spawn_location[1])**2) >= 60:
             self.stalkers.append(Stalker((40, 40), spawn_location))
     
     def spawn_squid(self):
         spawn_location = (int(random() * IMAGE_WIDTH * ROW_LENGTH), int(random() * IMAGE_HEIGHT * ROW_LENGTH))
         if random() <= SPAWN_RATE * 1.2 and math.sqrt(((self.player.get_location()[0] - spawn_location[0]) ** 2) +
-                                                      (self.player.get_location()[1] - spawn_location[1]) ** 2) >= 30:
+                                                      (self.player.get_location()[1] - spawn_location[1]) ** 2) >= 50:
             self.squids.append(Squid((40, 40), spawn_location))
     
     def player_shoot(self, mouse_click):
