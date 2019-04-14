@@ -8,6 +8,8 @@ from seagull import Seagull
 from pebble import Pebble
 from jellyfish import Jellyfish
 from stalker_fish import Stalker
+from squid import Squid
+from ink import Ink
 
 IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
@@ -23,7 +25,9 @@ class GameView:
 
         self.pebbles = [ ]
         self.jellyfish = [ ]
+        self.squids = [ ]
         self.stalkers = [ ]
+        self.inks = [ ]
         self.vignette = None
 
         self.stage = 1
@@ -82,13 +86,22 @@ class GameView:
                     jelly.health -= 1
                     if jelly.health == 0:
                         self.jellyfish.remove(jelly)
-                    self.pebbles.remove(pebble)
+                    if pebble in self.pebbles:
+                        self.pebbles.remove(pebble)
             for stalker in self.stalkers:
                 if pebble.rect.colliderect(stalker.rect):
                     stalker.health -= 1
                     if stalker.health == 0:
                         self.stalkers.remove(stalker)
-                    self.pebbles.remove(pebble)
+                    if pebble in self.pebbles:
+                        self.pebbles.remove(pebble)
+            for squid in self.squids:
+                if pebble.rect.colliderect(squid.rect):
+                    squid.health -= 1
+                    if squid.health == 0:
+                        self.squids.remove(squid)
+                    if pebble in self.pebbles:
+                        self.pebbles.remove(pebble)
             
         for jelly in self.jellyfish:
             self.screen.blit(jelly.image, jelly._location)
@@ -97,6 +110,17 @@ class GameView:
         for stalker in self.stalkers:
             self.screen.blit(stalker.image, stalker._location)
             stalker.update((self.player.get_location()[0]-stalker._location[0], self.player.get_location()[1]-stalker._location[1]))
+            
+        for squid in self.squids:
+            self.screen.blit(squid.image, squid._location)
+            squid.update((self.player.get_location()[0]-squid._location[0], self.player.get_location()[1]-squid._location[1]))
+            if pygame.time.get_ticks()%50 == 0:
+                self.squid_shoot(squid)
+                
+        for ink in self.inks:
+            self.screen.blit(Ink.img, ink.location)
+            ink.update()
+            
             
         if self.player.health > 0:
             self.player.update()
@@ -115,7 +139,7 @@ class GameView:
             if event.type == pygame.QUIT:
                 self.running = False
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.shoot(pygame.mouse.get_pos())
+                self.player_shoot(pygame.mouse.get_pos())
         keys = pygame.key.get_pressed()
         if self.player.health > 0:
             if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -136,18 +160,30 @@ class GameView:
                 
         self.spawn_jellyfish()
         self.spawn_stalker()
+        self.spawn_squid()
         
     def spawn_jellyfish(self):
-        if random() <= 0.03:
+        if random() <= 0.02:
             self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def spawn_stalker(self):
-        if random() <= 0.03:
+        if random() <= 0.02:
             self.stalkers.append(Stalker((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
-    def shoot(self, mouse_click):
+    
+    def spawn_squid(self):
+        if random() <= 0.02:
+            self.squids.append(Squid((40,40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
+    
+    def player_shoot(self, mouse_click):
         vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1], )
         if vector_direction != (0, 0):
             self.pebbles.append(Pebble(vector_direction, self.player.get_location()))
+            
+    def squid_shoot(self, squid):
+        vector_direction = pygame.math.Vector2(squid.vector_direction).normalize()
+        if vector_direction != (0,0):
+            self.inks.append(Ink(vector_direction, squid._location))
+        
 
     def _handle_symptoms(self):
         if random() > 0.99:
