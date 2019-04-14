@@ -158,13 +158,12 @@ class GameView:
                 self.running = False
         
         global INVERSE_SPEED, SPAWN_RATE
-        if pygame.time.get_ticks()%INVERSE_SPEED == 0:
-            self.player_shoot(pygame.mouse.get_pos())
             
         if pygame.time.get_ticks()%1000 == 0:
             if INVERSE_SPEED > 2: INVERSE_SPEED -= 1
             SPAWN_RATE += 0.001
-            
+
+        mouse_buttons = pygame.mouse.get_pressed()
         keys = pygame.key.get_pressed()
         if self.player.health > 0:
             if keys[pygame.K_w] or keys[pygame.K_UP]:
@@ -175,6 +174,9 @@ class GameView:
                 self._move("down")
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self._move("right")
+            if mouse_buttons[0]:
+                if pygame.time.get_ticks() % INVERSE_SPEED in (0, 1):
+                    self.player_shoot(pygame.mouse.get_pos())
         else:
             if keys[pygame.K_r]:
                 self.__init__()
