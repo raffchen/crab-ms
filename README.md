@@ -10,7 +10,7 @@ As the subtitle says, crab-ms is a bullet hell shooter game written completely i
 * Loss of vision - a vignette effect covers the screen, limiting the amount you're able to see
 
 ### How to play?
-To install, follow the link to the GitHub and download the source files. You'll need python and pygame installed. If you have those, just run ``game_runner.py``!
+To install, just download the source files. You'll need python and pygame installed. If you have those, just run ``game_runner.py``!
 
 ### Controls
 * WASD or Arrow Keys to move the crab
