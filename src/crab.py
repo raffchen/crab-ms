@@ -23,6 +23,7 @@ class Crab(Player):
             "vision": {"status": False, "timer": 0}
         }
         self.speed = 6
+        self.rect = pygame.Rect(self._location[0], self._location[1], 35, 35)
 
     def update_location(self, move):
         self._location = (self._location[0]+move[0], self._location[1]+move[1])

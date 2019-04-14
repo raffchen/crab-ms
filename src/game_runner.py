@@ -16,7 +16,7 @@ IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
 ROW_LENGTH = map_generator.ABSOLUTE_BORDER_SIZE
 
-SPAWN_RATE = 0.03
+SPAWN_RATE = 0.02
 INVERSE_SPEED = 10
 
 LAST_MOUSE_POSITION = (0,0)
@@ -124,21 +124,32 @@ class GameView:
         for jelly in self.jellyfish:
             self.screen.blit(jelly.image, jelly._location)
             jelly.update()
+            if jelly.rect.colliderect(self.player.rect):
+                self.player.health -= 10
+                self.jellyfish.remove(jelly)
             
         for stalker in self.stalkers:
             self.screen.blit(stalker.image, stalker._location)
             stalker.update((self.player.get_location()[0]-stalker._location[0], self.player.get_location()[1]-stalker._location[1]))
-            
+            if stalker.rect.colliderect(self.player.rect):
+                self.player.health -= 10
+                self.stalkers.remove(stalker)
+                
         for squid in self.squids:
             self.screen.blit(squid.image, squid._location)
             squid.update((self.player.get_location()[0]-squid._location[0], self.player.get_location()[1]-squid._location[1]))
             if pygame.time.get_ticks()%50 == 0:
                 self.squid_shoot(squid)
+            if squid.rect.colliderect(self.player.rect):
+                self.player.health -= 10
+                self.squids.remove(squid)
                 
         for ink in self.inks:
             self.screen.blit(Ink.img, ink.location)
             ink.update()
-            
+            if ink.rect.colliderect(self.player.rect):
+                self.player.health -= 10
+                self.inks.remove(ink)
             
         if self.player.health > 0:
             self.player.update()
