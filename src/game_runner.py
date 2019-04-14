@@ -19,7 +19,7 @@ ROW_LENGTH = map_generator.ABSOLUTE_BORDER_SIZE
 SPAWN_RATE = 0.01
 INVERSE_SPEED = 10
 
-LAST_MOUSE_POSITION = (0,0)
+LAST_MOUSE_POSITION = (0, 0)
 
 
 class GameView:
@@ -29,11 +29,11 @@ class GameView:
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
 
-        self.pebbles = [ ]
-        self.jellyfish = [ ]
-        self.squids = [ ]
-        self.stalkers = [ ]
-        self.inks = [ ]
+        self.pebbles = []
+        self.jellyfish = []
+        self.squids = []
+        self.stalkers = []
+        self.inks = []
         self.littlefish = []
         self.vignette = None
 
@@ -215,7 +215,6 @@ class GameView:
         if random() <= SPAWN_RATE:
             self.littlefish.append(LittleFish(self.player,(int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
             
-            
     def spawn_stalker(self):
         if random() <= SPAWN_RATE:
             self.stalkers.append(Stalker((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
@@ -233,7 +232,6 @@ class GameView:
         vector_direction = pygame.math.Vector2(squid.vector_direction).normalize()
         if vector_direction != (0,0):
             self.inks.append(Ink(vector_direction, squid._location))
-        
 
     def _handle_symptoms(self):
         if random() > 0.99:
