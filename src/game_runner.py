@@ -11,6 +11,7 @@ IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
 ROW_LENGTH = map_generator.ABSOLUTE_BORDER_SIZE
 
+
 class GameView:
     def __init__(self):
         self.running = True
@@ -120,7 +121,7 @@ class GameView:
 
     def _handle_symptoms(self):
         if random() > 0.99:
-            random_symptom = choice(["loss-of-balance", "fatigue"])
+            random_symptom = choice(["loss-of-balance", "fatigue", "pain"])
             print(f"selected {random_symptom}")
             if not self.player.symptoms[random_symptom]["status"]:
                 if random() > .85:
@@ -161,13 +162,17 @@ class GameView:
                                       "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
                 else:
                     self.player.symptoms[symptom]["timer"] += 1
+
+            elif symptom == 'pain' and flag["status"]:
+                damage = choices([10, 5, 2, 1], [2, 8, 20, 20])[0]
+                self.player.health -= damage
+                print(f"received {damage} damage")
                 
         if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
                 or (key == "left" and not self.player.rect.left <= self.background.rect.left)
                 or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
                 or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
             self.player.update_location(self.moves[key])
-            
 
 
 if __name__ == '__main__':
