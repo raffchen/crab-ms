@@ -7,6 +7,7 @@ from player import Player
 from seagull import Seagull
 from pebble import Pebble
 from jellyfish import Jellyfish
+from littlefish import LittleFish
 from stalker_fish import Stalker
 
 IMAGE_WIDTH = map_generator.IMAGE_WIDTH
