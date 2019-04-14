@@ -85,6 +85,12 @@ class GameView:
                     if jelly.health == 0:
                         self.jellyfish.remove(jelly)
                     self.pebbles.remove(pebble)
+            for stalker in self.stalkers:
+                if pebble.rect.colliderect(stalker.rect):
+                    stalker.health -= 1
+                    if stalker.health == 0:
+                        self.stalkers.remove(stalker)
+                    self.pebbles.remove(pebble)
             
         l_lst = []
         
@@ -96,12 +102,7 @@ class GameView:
 
         self.littlefish = l_lst
         
-        for stalker in self.stalkers:
-                if pebble.rect.colliderect(stalker.rect):
-                    stalker.health -= 1
-                    if stalker.health == 0:
-                        self.stalkers.remove(stalker)
-                    self.pebbles.remove(pebble)
+        
             
         for jelly in self.jellyfish:
             self.screen.blit(jelly.image, jelly._location)
