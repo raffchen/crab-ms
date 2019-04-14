@@ -6,10 +6,12 @@ from crab import Crab
 from player import Player
 from seagull import Seagull
 from pebble import Pebble
+from jellyfish import Jellyfish
 
 IMAGE_WIDTH = map_generator.IMAGE_WIDTH
 IMAGE_HEIGHT = map_generator.IMAGE_HEIGHT
 ROW_LENGTH = map_generator.ABSOLUTE_BORDER_SIZE
+
 
 class GameView:
     def __init__(self):
@@ -17,12 +19,13 @@ class GameView:
         self.screen = pygame.display.set_mode((IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.background = Player(str(Path("./data/images/beach.jpg")), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH))
         self.player = Crab(str(Path("./data/images/crab_images/Crab Standing Animation/crab_standing_still0.png")), (35, 35), (300, 200))
-
         self.pebbles = []
+        self.jellyfish = []
+        self.vignette = None
         self.stage = 1
-        self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
-                       Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
-                       Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
+        # self.months = [Player(str(Path("./data/images/month1.png")), (216, 134), (500, -12)),
+        #                Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
+        #                Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
         '''self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
                       Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
@@ -43,7 +46,7 @@ class GameView:
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
-        pygame.mixer.music.play() 
+        pygame.mixer.music.play(-1) 
 
     def run(self):
         """initializes, executes, and quits the pygame"""
@@ -70,13 +73,26 @@ class GameView:
         for pebble in self.pebbles:
             self.screen.blit(Pebble.img, pebble.location)
             pebble.update()
+            for jelly in self.jellyfish:
+                if pebble.rect.colliderect(jelly.rect):
+                    jelly.health -= 1
+                    if jelly.health == 0:
+                        self.jellyfish.remove(jelly)
+                    self.pebbles.remove(pebble)
+            
+        for jelly in self.jellyfish:
+            self.screen.blit(jelly.image, jelly._location)
+            jelly.update()
+            
         if self.player.health > 0:
             self.player.update()
             self.screen.blit(self.player.img, self.player.rect)
             
         else:
             self.screen.blit(self.end_screen.img, self.end_screen.rect)
-        self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
+        if self.vignette is not None:
+            self.screen.blit(self.vignette, (0, 0))
+        # self.screen.blit(self.months[self.stage-1].img, self.months[self.stage-1].rect)
         self.screen.blit(self.h_bars[int(self.player.health/10)].img, self.h_bars[int(self.player.health/10)].rect)
         pygame.display.flip()
 
@@ -103,32 +119,29 @@ class GameView:
                 pygame.mixer.music.play() 
                 map_generator.default_x_coord = map_generator.DEFAULT_STARTING_X_COORD
                 map_generator.default_y_coord = map_generator.DEFAULT_STARTING_Y_COORD
+                
+        self.spawn_jellyfish()
+        
+    def spawn_jellyfish(self):
+        if random() <= 0.03:
+            self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def shoot(self, mouse_click):
-        vector_direction = [0, 0]
-        if self.player.get_location()[0] - mouse_click[0] < 0:
-            vector_direction[0] = 1
-        elif self.player.get_location()[0] - mouse_click[0] > 0:
-            vector_direction[0] = -1
-        if self.player.get_location()[1] - mouse_click[1] < 0:
-            vector_direction[1] = 1
-        elif self.player.get_location()[1] - mouse_click[1] > 0:
-            vector_direction[1] = -1
-        vector_direction = tuple(vector_direction)
+        vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1], )
         if vector_direction != (0, 0):
             self.pebbles.append(Pebble(vector_direction, self.player.get_location()))
 
     def _handle_symptoms(self):
         if random() > 0.99:
-            random_symptom = choice(["loss-of-balance", "fatigue"])
+            random_symptom = choice(["loss-of-balance", "fatigue", "pain", "vision"])
             print(f"selected {random_symptom}")
             if not self.player.symptoms[random_symptom]["status"]:
-                if random() > .85:
+                if random() > .89:
                     self.player.symptoms[random_symptom]["status"] = True
                     print(f"{random_symptom} now active")
 
     def _move(self, key):
-        self._handle_symptoms()
+       # self._handle_symptoms()
         for symptom, flag in self.player.symptoms.items():
             if symptom == 'loss-of-balance' and flag["status"]:
                 if flag["timer"] == 0:
@@ -161,13 +174,32 @@ class GameView:
                                       "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
                 else:
                     self.player.symptoms[symptom]["timer"] += 1
+
+            elif symptom == 'pain' and flag["status"]:
+                damage = choices([10, 5, 2, 1], [2, 8, 20, 20])[0]
+                self.player.health -= damage
+                print(f"received {damage} damage")
+                print(f"{self.player.health} health remaining")
+                self.player.symptoms[symptom]["status"] = False
+
+            elif symptom == 'vision' and flag["status"]:
+                if flag["timer"] == 0:
+                    self.vignette = pygame.image.load(str(Path('./data/images/vignette.png')))
+                    self.player.symptoms[symptom]["timer"] += 1
+                elif flag["timer"] == 150:
+                    self.vignette = None
+                    pygame.display.flip()
+                    self.player.symptoms[symptom]["timer"] = 0
+                    self.player.symptoms[symptom]["status"] = False
+                else:
+                    self.player.symptoms[symptom]["timer"] += 1
                 
-        if ((key == "up" and not self.player.rect.top <= self.background.rect.top)
-                or (key == "left" and not self.player.rect.left <= self.background.rect.left)
-                or (key == "down" and not self.player.rect.bottom >= self.background.rect.bottom)
-                or (key == "right" and not self.player.rect.right >= self.background.rect.right)):
+        proposed_move = self.player.rect.move(*self.moves[key])
+        if (not proposed_move.right > self.background.rect.right and
+                not proposed_move.left < self.background.rect.left and
+                not proposed_move.top < self.background.rect.top and
+                not proposed_move.bottom > self.background.rect.bottom):
             self.player.update_location(self.moves[key])
-            
 
 
 if __name__ == '__main__':

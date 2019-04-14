@@ -19,6 +19,7 @@ class Crab(Player):
         self.symptoms = {
             "loss-of-balance": {"status": False, "timer": 0},
             "fatigue": {"status": False, "timer": 0},
+            "pain": {"status": False, "timer": 0},
             "vision": {"status": False, "timer": 0},
             "weakness": {"status": False, "timer": 0}
         }
@@ -26,9 +27,7 @@ class Crab(Player):
 
     def update_location(self, move):
         self._location = (self._location[0]+move[0], self._location[1]+move[1])
-        print(self._location)
         self.rect = pygame.Rect(self._location[0], self._location[1], 35, 35)
-        print(self.rect)
 
     def get_location(self):
         return self._location
