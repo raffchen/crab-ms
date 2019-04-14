@@ -1,12 +1,13 @@
 import pygame
 from pathlib import Path
-from random import random, choice, choices
+from random import random, choice, choices, randint
 import map_generator
 from crab import Crab
 from player import Player
 from seagull import Seagull
 from pebble import Pebble
 from jellyfish import Jellyfish
+from littlefish import LittleFish
 from stalker_fish import Stalker
 from squid import Squid
 from ink import Ink
@@ -28,6 +29,7 @@ class GameView:
         self.squids = [ ]
         self.stalkers = [ ]
         self.inks = [ ]
+        self.littlefish = []
         self.vignette = None
 
         self.stage = 1
@@ -35,9 +37,9 @@ class GameView:
         #                Player(str(Path("./data/images/month2.png")), (216, 134), (500, -12)),
         #                Player(str(Path("./data/images/month3.png")), (216, 134), (500, -12)),]
         self.end_screen = Player(str(Path("./data/images/endgame.png")), (700, 450))
-        '''self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
-                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
-                      Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]'''
+        # self.gulls = [Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+        #               Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background),
+        #               Seagull(str(Path("./data/images/seagull.png")), (72, 44), self.background)]
         self.h_bars = [Player(str(Path("./data/images/health0.png")), (216, 134), (10, -30)),
                        Player(str(Path("./data/images/health1.png")), (216, 134), (10, -30)),
                        Player(str(Path("./data/images/health2.png")), (216, 134), (10, -30)),
@@ -50,7 +52,8 @@ class GameView:
 
         self.moves = {"up": (0, -self.player.speed), "left": (-self.player.speed, 0),
                       "down": (0, self.player.speed), "right": (self.player.speed, 0)}
-        print(self.moves)
+        self._moves = self.moves.copy()
+
         pygame.mixer.init()
         pygame.mixer.music.set_volume(0.7)
         pygame.mixer.music.load("./data/music/Intro.mp3")
@@ -95,6 +98,7 @@ class GameView:
                         self.stalkers.remove(stalker)
                     if pebble in self.pebbles:
                         self.pebbles.remove(pebble)
+                        
             for squid in self.squids:
                 if pebble.rect.colliderect(squid.rect):
                     squid.health -= 1
@@ -102,6 +106,15 @@ class GameView:
                         self.squids.remove(squid)
                     if pebble in self.pebbles:
                         self.pebbles.remove(pebble)
+            
+        l_lst = []
+        for fish in self.littlefish.copy():
+            self.screen.blit(fish.image, fish._location)
+            var = fish.update()
+            if(var):
+                l_lst.append(var)
+
+        self.littlefish = l_lst
             
         for jelly in self.jellyfish:
             self.screen.blit(jelly.image, jelly._location)
@@ -161,11 +174,17 @@ class GameView:
         self.spawn_jellyfish()
         self.spawn_stalker()
         self.spawn_squid()
+        self.spawn_littlefish()
         
     def spawn_jellyfish(self):
         if random() <= 0.02:
             self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
+    def spawn_littlefish(self):
+        if random() <= 0.02:
+            self.littlefish.append(LittleFish(self.player,(int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
+            
+            
     def spawn_stalker(self):
         if random() <= 0.02:
             self.stalkers.append(Stalker((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
@@ -190,22 +209,21 @@ class GameView:
             random_symptom = choice(["loss-of-balance", "fatigue", "pain", "vision"])
             print(f"selected {random_symptom}")
             if not self.player.symptoms[random_symptom]["status"]:
-                if random() > .89:
+                if random() > .87:
                     self.player.symptoms[random_symptom]["status"] = True
                     print(f"{random_symptom} now active")
 
     def _move(self, key):
-       # self._handle_symptoms()
+        self._handle_symptoms()
+        symptom_cooldown = randint(100, 200)
         for symptom, flag in self.player.symptoms.items():
             if symptom == 'loss-of-balance' and flag["status"]:
                 if flag["timer"] == 0:
-                    self._moves = self.moves.copy()
                     self.moves = dict(zip(sorted(self.moves.keys(), key=lambda x: random()),
                                       sorted(self.moves.values(), key=lambda x: random())))
                     self.player.symptoms[symptom]["timer"] += 1
-                elif flag["timer"] == 150:
+                elif flag["timer"] > symptom_cooldown:
                     self.moves = self._moves
-                    del self._moves
                     self.player.symptoms[symptom]["status"] = False
                     self.player.symptoms[symptom]["timer"] = 0
                 else:
@@ -216,7 +234,7 @@ class GameView:
                     self.player.speed = choices([0, 1, 2, 3], [5, 10, 10, 25])[0]/4
                     self.moves = {k: tuple(map(lambda x: int(x * self.player.speed), v)) for k, v in self.moves.items()}
                     self.player.symptoms[symptom]["timer"] += 1
-                elif flag["timer"] == 150:
+                elif flag["timer"] > symptom_cooldown:
                     self.player.speed = 4
                     self.player.symptoms[symptom]["status"] = False
                     self.player.symptoms[symptom]["timer"] = 0
@@ -224,8 +242,7 @@ class GameView:
                         self.moves = {k: tuple(map(lambda x: int(x * self.player.speed/x), v))
                                       for k, v in self.moves.items()}
                     except ZeroDivisionError:
-                        self.moves = {"up": (0, self.player.speed), "left": (self.player.speed, 0),
-                                      "down": (0, -self.player.speed), "right": (-self.player.speed, 0)}
+                        self.moves = self._moves.copy()
                 else:
                     self.player.symptoms[symptom]["timer"] += 1
 
@@ -240,7 +257,7 @@ class GameView:
                 if flag["timer"] == 0:
                     self.vignette = pygame.image.load(str(Path('./data/images/vignette.png')))
                     self.player.symptoms[symptom]["timer"] += 1
-                elif flag["timer"] == 150:
+                elif flag["timer"] > symptom_cooldown:
                     self.vignette = None
                     pygame.display.flip()
                     self.player.symptoms[symptom]["timer"] = 0
