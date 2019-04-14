@@ -73,6 +73,12 @@ class GameView:
         for pebble in self.pebbles:
             self.screen.blit(Pebble.img, pebble.location)
             pebble.update()
+            for jelly in self.jellyfish:
+                if pebble.rect.colliderect(jelly.rect):
+                    jelly.health -= 1
+                    if jelly.health == 0:
+                        self.jellyfish.remove(jelly)
+                    self.pebbles.remove(pebble)
             
         for jelly in self.jellyfish:
             self.screen.blit(jelly.image, jelly._location)
@@ -104,10 +110,6 @@ class GameView:
                 self._move("down")
             if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 self._move("right")
-            if keys[pygame.K_SPACE]:
-                print('space')
-                self.jellyfish.append(Jellyfish((35, 35), (int(IMAGE_WIDTH*ROW_LENGTH*random()), int(IMAGE_HEIGHT*ROW_LENGTH*random()))))
-                print(self.jellyfish)
         else:
             if keys[pygame.K_r]:
                 self.__init__()
@@ -120,7 +122,7 @@ class GameView:
         
     def spawn_jellyfish(self):
         if random() <= 0.03:
-            self.jellyfish.append(Jellyfish((35, 35), (IMAGE_WIDTH*ROW_LENGTH, IMAGE_HEIGHT*ROW_LENGTH)))
+            self.jellyfish.append(Jellyfish((40, 40), (int(random()*IMAGE_WIDTH*ROW_LENGTH), int(random()*IMAGE_HEIGHT*ROW_LENGTH))))
     
     def shoot(self, mouse_click):
         vector_direction = (mouse_click[0]-self.player.get_location()[0],mouse_click[1]-self.player.get_location()[1], )
