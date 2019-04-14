@@ -27,9 +27,7 @@ class Crab(Player):
 
     def update_location(self, move):
         self._location = (self._location[0]+move[0], self._location[1]+move[1])
-        print(self._location)
         self.rect = pygame.Rect(self._location[0], self._location[1], 35, 35)
-        print(self.rect)
 
     def get_location(self):
         return self._location

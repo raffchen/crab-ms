@@ -7,7 +7,9 @@ class Pebble:
     speed = 15
     
     def __init__(self, vector_direction, location):
+        print(vector_direction)
         self.vector_direction = pygame.math.Vector2(vector_direction).normalize()
+        print(self.vector_direction)
         self.location = location
         
     def update(self):

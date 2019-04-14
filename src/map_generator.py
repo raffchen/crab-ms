@@ -5,7 +5,7 @@ import os
 from email.policy import default
 
 
-ABSOLUTE_BORDER_SIZE = 12
+ABSOLUTE_BORDER_SIZE = 8
 
 IMAGE_WIDTH = 75
 IMAGE_HEIGHT = 75
